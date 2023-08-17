@@ -15,7 +15,7 @@ class UpdateTagRequest extends FormRequest
     public function rules()
     {
         return [
-            'title' => 'required|string|min:5'
+            'title' => 'required|string'
         ];
     }
 }

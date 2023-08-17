@@ -45,6 +45,6 @@ class TagController extends Controller
     {
         $tag->delete();
 
-        return response()->json(['message' => 'deleted'], 204);
+        return response()->json(['message' => 'deleted'],204);
     }
 }
