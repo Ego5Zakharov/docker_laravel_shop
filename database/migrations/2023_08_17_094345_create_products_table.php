@@ -19,6 +19,11 @@ class CreateProductsTable extends Migration
             $table->integer('quantity');
 
             $table->boolean('is_published');
+
+            $table->foreignId('category_id')
+                ->nullable()
+                ->constrained('categories');
+
             $table->timestamps();
         });
     }

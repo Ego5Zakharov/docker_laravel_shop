@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Product\ProductController;
 use App\Http\Controllers\TagController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CategoryController;
@@ -22,4 +23,12 @@ Route::group(['namespace' => 'Tag', 'prefix' => 'tags'], function () {
     Route::get('/{tag}', [TagController::class, 'show']);
     Route::patch('/{tag}', [TagController::class, 'update']);
     Route::delete('/{tag}', [TagController::class, 'delete']);
+});
+
+Route::group(['namespace' => 'Product', 'prefix' => 'products'], function () {
+//    Route::get('/', [ProductController::class, 'index']);
+    Route::post('/', [ProductController::class, 'store']);
+//    Route::get('/{product}', [ProductController::class, 'show']);
+//    Route::patch('/{product}', [ProductController::class, 'update']);
+//    Route::delete('/{product}', [ProductController::class, 'delete']);
 });

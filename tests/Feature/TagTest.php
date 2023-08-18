@@ -10,6 +10,12 @@ class TagTest extends TestCase
 {
     use RefreshDatabase;
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->withHeaders(['accept' => 'application/json']);
+    }
+
     /** @test */
     public function a_tag_can_be_stored()
     {
@@ -67,7 +73,7 @@ class TagTest extends TestCase
     }
 
     /** @test */
-    public function a_tags_index_view()
+    public function tags_index_view()
     {
         $this->withoutExceptionHandling();
 
@@ -101,5 +107,16 @@ class TagTest extends TestCase
         $res->assertInvalid('title');
     }
 
+    /** @test */
+    public function attribute_title_is_required_in_updating_tag()
+    {
+        $data = [
+            'title' => ''
+        ];
+        $tag = Tag::factory()->create();
 
+        $res = $this->patch("/api/tags/{$tag->id}", $data);
+
+        $res->assertInvalid('title');
+    }
 }
