@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Events\Product\ProductDeleting;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -34,6 +35,8 @@ class Product extends Model
         'is_published' => 'boolean',
     ];
 
+
+
     public function category(): belongsTo
     {
         return $this->belongsTo(
@@ -58,5 +61,5 @@ class Product extends Model
             Image::class,
             'product_id',
             'id');
-    }   
+    }
 }

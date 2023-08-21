@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\Facade;
  */
 class ProductFacade extends Facade
 {
-    protected static function getFacadeAccessor()
+    protected static function getFacadeAccessor(): string
     {
         return 'productService';
     }

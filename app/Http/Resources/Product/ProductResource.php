@@ -3,6 +3,7 @@
 namespace App\Http\Resources\Product;
 
 use App\Http\Resources\Category\CategoryResource;
+use App\Http\Resources\Image\ImageResource;
 use App\Http\Resources\Tag\TagResource;
 use App\Models\Product;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -21,11 +22,11 @@ class ProductResource extends JsonResource
             'price' => $this->resource->price,
             'quantity' => $this->resource->quantity,
             'is_published' => $this->resource->is_published,
-            'article'=>$this->resource->article
-            
-//            'images'=> ImagesResource::collection($this->resource->images),
-//            'category' => CategoryResource::make($this->resource->category),
-//            'tags' => TagResource::collection($this->resource->tags),
+            'article' => $this->resource->article,
+
+            'images'=> ImageResource::collection($this->resource->images),
+            'category' => CategoryResource::make($this->resource->category),
+            'tags' => TagResource::collection($this->resource->tags),
         ];
     }
 }

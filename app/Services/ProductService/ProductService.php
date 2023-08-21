@@ -2,7 +2,10 @@
 
 namespace App\Services\ProductService;
 
+use App\Models\Product;
 use App\Services\ProductService\Repositories\ProductRepository;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 
 class ProductService
 {
@@ -15,26 +18,26 @@ class ProductService
 
     public function index()
     {
-
+        return $this->productRepository->index();
     }
 
-    public function show()
+    public function show(Product $product)
     {
-        //
+        return $this->productRepository->show($product);
     }
 
-    public function store(array $data)
+    public function store(array $data): Model|Builder
     {
         return $this->productRepository->store($data);
     }
 
-    public function update()
+    public function update(array $data, Product $product): Model|Builder
     {
-        //
+        return $this->productRepository->update($data, $product);
     }
 
-    public function delete()
+    public function delete(Product $product): bool
     {
-        //
+        return $this->productRepository->delete($product);
     }
 }

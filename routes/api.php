@@ -26,9 +26,9 @@ Route::group(['namespace' => 'Tag', 'prefix' => 'tags'], function () {
 });
 
 Route::group(['namespace' => 'Product', 'prefix' => 'products'], function () {
-//    Route::get('/', [ProductController::class, 'index']);
+    Route::get('/', [ProductController::class, 'index']);
+    Route::get('/{product}', [ProductController::class, 'show']);
     Route::post('/', [ProductController::class, 'store']);
-//    Route::get('/{product}', [ProductController::class, 'show']);
-//    Route::patch('/{product}', [ProductController::class, 'update']);
-//    Route::delete('/{product}', [ProductController::class, 'delete']);
+    Route::post('/{product}/update', [ProductController::class, 'update']); // form-data в postman не работает с patch(не принимает картинки)
+    Route::delete('/{product}', [ProductController::class, 'delete']);
 });
