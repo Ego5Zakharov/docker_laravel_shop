@@ -30,7 +30,7 @@ class ProductController extends Controller
     public function store(CreateProductRequest $request): ProductResource
     {
         $validated = $request->validated();
-
+//        dd($validated);
         return ProductResource::make(
             ProductFacade::store($validated)
         );

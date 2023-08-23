@@ -44,8 +44,8 @@ class ProductRepository
             'article' => $this->generateArticle(),
         ]);
 
-        $this->loadFiles($data['images'], $product);
         $product->tags()->attach($data['tags']);
+        $this->loadFiles($data['images'], $product);
 
         return $product;
     }

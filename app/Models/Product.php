@@ -31,7 +31,7 @@ class Product extends Model
     ];
 
     protected $casts = [
-        'price' => 'float',
+        'price' => 'integer',
         'is_published' => 'boolean',
     ];
 

@@ -17,16 +17,18 @@ class UpdateProductRequest extends FormRequest
         return [
             'title' => 'required|string|min:5',
             'description' => 'required|string|min:5',
-
             'price' => 'required|numeric',
             'quantity' => 'required|integer',
             'is_published' => 'nullable|boolean',
+
             'category_id' => 'nullable|int',
+
             'tags' => 'nullable|array|min:1',
             'tags.*' => 'required|integer|min:1',
-                
+
             'images' => 'nullable|array|min:1',
-            'images.*' => 'required|file|min:1|mimes:jpg,png,gif'
+            'images.*' => 'required|file|max:2048',
+            'images.*.extension' => 'in:jpg,png,gif',
         ];
     }
 }

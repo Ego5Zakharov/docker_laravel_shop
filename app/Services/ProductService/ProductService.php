@@ -6,6 +6,7 @@ use App\Models\Product;
 use App\Services\ProductService\Repositories\ProductRepository;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class ProductService
 {
@@ -16,7 +17,7 @@ class ProductService
         $this->productRepository = $productRepository;
     }
 
-    public function index()
+    public function index(): LengthAwarePaginator
     {
         return $this->productRepository->index();
     }
