@@ -52,7 +52,7 @@ class ProductRepository
 
     public function update(array $data, Product $product): Model|Builder
     {
-        $product::query()->update([
+        $product->update([
             'title' => $data['title'],
             'description' => $data['description'],
             'price' => $data['price'],

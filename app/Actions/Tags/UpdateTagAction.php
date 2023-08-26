@@ -11,7 +11,7 @@ class UpdateTagAction
 {
     public function run(TagData $data, Tag $tag): Model|Collection|Builder|array|null
     {
-        $tag->query()->update(['title' => $data->title]);
+        $tag->update(['title' => $data->title]);
 
         return Tag::query()->find($tag->id);
     }

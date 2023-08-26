@@ -25,6 +25,7 @@ Route::group(['namespace' => 'Tag', 'prefix' => 'tags'], function () {
     Route::delete('/{tag}', [TagController::class, 'delete']);
 });
 
+
 Route::group(['namespace' => 'Product', 'prefix' => 'products'], function () {
     Route::get('/', [ProductController::class, 'index']);
     Route::get('/{product}', [ProductController::class, 'show']);
