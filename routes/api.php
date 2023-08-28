@@ -10,7 +10,7 @@ use App\Http\Controllers\CategoryController;
 //});
 
 Route::group(['namespace' => 'Category', 'prefix' => 'categories'], function () {
-    Route::get('/', [CategoryController::class, 'index']);
+    Route::post('/index', [CategoryController::class, 'index']);
     Route::post('/', [CategoryController::class, 'store']);
     Route::get('/{category}', [CategoryController::class, 'show']);
     Route::patch('/{category}', [CategoryController::class, 'update']);
@@ -18,7 +18,7 @@ Route::group(['namespace' => 'Category', 'prefix' => 'categories'], function () 
 });
 
 Route::group(['namespace' => 'Tag', 'prefix' => 'tags'], function () {
-    Route::get('/', [TagController::class, 'index']);
+    Route::post('/index', [TagController::class, 'index']);
     Route::post('/', [TagController::class, 'store']);
     Route::get('/{tag}', [TagController::class, 'show']);
     Route::patch('/{tag}', [TagController::class, 'update']);

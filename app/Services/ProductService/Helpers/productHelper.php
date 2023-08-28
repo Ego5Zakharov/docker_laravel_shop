@@ -24,6 +24,14 @@ trait productHelper
         return $randomString;
     }
 
+    public function getProductByModel(Product $product)
+    {
+        return Product::query()
+            ->find($product)
+            ->with(['images', 'tags', 'category'])
+            ->first();
+    }
+
     public function deleteProductImages(Product $product): bool
     {
         if (!$product->images()->exists()) {
@@ -35,7 +43,7 @@ trait productHelper
         }
 
         $product->images()->delete();
-        
+
         return true;
     }
 }

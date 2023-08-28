@@ -9,6 +9,7 @@ use App\Services\ProductService\Helpers\productHelper;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Pagination\LengthAwarePaginator;
 
 class ProductRepository
@@ -32,47 +33,67 @@ class ProductRepository
             ->first();
     }
 
-    public function store(array $data): Model|Builder
+    public function store(array $data): Model|Builder|null
     {
-        $product = Product::query()->create([
-            'title' => $data['title'],
-            'description' => $data['description'],
-            'price' => $data['price'],
-            'quantity' => $data['quantity'],
-            'category_id' => $data['category_id'],
-            'is_published' => $data['is_published'],
-            'article' => $this->generateArticle(),
-        ]);
+        $product = null;
 
-        $product->tags()->attach($data['tags']);
-        $this->loadFiles($data['images'], $product);
+        transaction(function () use ($data, &$product) {
+            $product = Product::query()->create([
+                'title' => $data['title'],
+                'description' => $data['description'],
+                'price' => $data['price'],
+                'quantity' => $data['quantity'],
+                'category_id' => $data['category_id'],
+                'is_published' => $data['is_published'],
+                'article' => $this->generateArticle(),
+            ]);
 
+            $product->tags()->attach($data['tags']);
+
+            $this->loadFiles($data['images'], $product);
+
+            $this->createProductFile($data['preview_image_path'] ?? null, $product, true);
+
+            return $product;
+        });
         return $product;
     }
 
-    public function update(array $data, Product $product): Model|Builder
+    public function update(array $data, Product $product): Model|Builder|int
     {
-        $product->update([
-            'title' => $data['title'],
-            'description' => $data['description'],
-            'price' => $data['price'],
-            'quantity' => $data['quantity'],
-            'is_published' => $data['is_published'],
-            'category_id' => $data['category_id'],
-        ]);
+        transaction(function () use ($data, &$product) {
 
-        $this->loadFiles($data['images'], $product);
-        $product->tags()->attach($data['tags']);
+            $product = $product->fill([
+                'title' => $data['title'],
+                'description' => $data['description'],
+                'price' => $data['price'],
+                'quantity' => $data['quantity'],
+                'category_id' => $data['category_id'],
+                'is_published' => $data['is_published'],
+                'article' => $this->generateArticle(),
+            ]);
 
+            $product->tags()->attach($data['tags']);
+
+            $this->loadFiles($data['images'], $product);
+
+            $this->createProductFile($data['preview_image_path'] ?? null, $product, true);
+
+            return $product;
+        });
         return $product;
     }
 
     public function delete(Product $product): bool
     {
-        $this->deleteProductImages($product);
-        $product->tags()->detach();
-        $product->delete();
+        transaction(function ($product) {
+            $this->deleteProductImages($product);
+            $product->tags()->detach();
+            $product->delete();
 
-        return true;
+            return true;
+        });
+
+        return false;
     }
 }

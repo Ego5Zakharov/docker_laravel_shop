@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Actions\Tags\CreateTagAction;
 use App\Actions\Tags\TagData;
 use App\Actions\Tags\UpdateTagAction;
+use App\Http\Requests\Tag\IndexTagRequest;
 use App\Http\Requests\Tag\UpdateTagRequest;
 use App\Http\Requests\Tag\CreateTagRequest;
 use App\Http\Resources\Tag\TagResource;
@@ -14,9 +15,15 @@ use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
 class TagController extends Controller
 {
-    public function index(): AnonymousResourceCollection
+    public function index(IndexTagRequest $request): AnonymousResourceCollection
     {
-        return TagResource::collection(Tag::query()->get());
+        $data = $request->validated();
+
+        $perPage = 5;
+
+        $tags = Tag::query()->paginate($perPage, ['*'], 'page', $data['page']);
+
+        return TagResource::collection($tags);
     }
 
     public function store(CreateTagRequest $request): TagResource
@@ -45,6 +52,6 @@ class TagController extends Controller
     {
         $tag->delete();
 
-        return response()->json(['message' => 'deleted'],204);
+        return response()->json(['message' => 'deleted'], 204);
     }
 }

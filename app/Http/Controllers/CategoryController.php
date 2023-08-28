@@ -7,6 +7,7 @@ use App\Actions\Categories\CreateCategoryAction;
 use App\Actions\Categories\DeleteCategoryAction;
 use App\Actions\Categories\UpdateCategoryAction;
 use App\Http\Requests\Category\CreateCategoryRequest;
+use App\Http\Requests\Category\IndexCategoryRequest;
 use App\Http\Requests\Category\UpdateCategoryRequest;
 use App\Http\Resources\Category\CategoryResource;
 use App\Models\Category;
@@ -16,9 +17,15 @@ use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
 class CategoryController extends Controller
 {
-    public function index(): AnonymousResourceCollection
+    public function index(IndexCategoryRequest $request): AnonymousResourceCollection
     {
-        return CategoryResource::collection(Category::query()->get());
+        $data = $request->validated();
+
+        $perPage = 5;
+
+        $categories = Category::query()->paginate($perPage, ['*'], 'page', $data['page']);
+
+        return CategoryResource::collection($categories);
     }
 
     public function store(CreateCategoryRequest $request): CategoryResource

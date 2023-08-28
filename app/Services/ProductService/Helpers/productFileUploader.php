@@ -5,6 +5,7 @@ namespace App\Services\ProductService\Helpers;
 
 use App\Models\Image;
 use App\Models\Product;
+use Illuminate\Database\Eloquent\Concerns\QueriesRelationships;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -25,8 +26,12 @@ trait productFileUploader
         return $images;
     }
 
-    private function createProductFile(UploadedFile $image, Product $product): Image
+    private function createProductFile(?UploadedFile $image, Product $product, $isPreview = false): ?Image
     {
+        if ($image === null) {
+            return null;
+        }
+
         $fileName = $this->createFileName($image);
 
         $imagePath = 'images/products/' . $fileName;
@@ -35,10 +40,22 @@ trait productFileUploader
             $image, $this->createFileName($image)
         );
 
+        return $this->createNewImageModel($imagePath, $product, $isPreview);
+    }
+
+    private function createNewImageModel(string $imagePath, Product $product, $isPreview = false): Image
+    {
+        $imageUrl = 'storage/' . $imagePath;
+
         $imageModel = new Image([
             'path' => $imagePath,
-            'url' => asset('storage/' . $imagePath),
+            'url' => asset($imageUrl),
             'product_id' => $product->id
+        ]);
+
+        if ($isPreview) $product->update([
+            'preview_image_path' => $imagePath,
+            'preview_image_url' => $imageUrl
         ]);
 
         $imageModel->save();

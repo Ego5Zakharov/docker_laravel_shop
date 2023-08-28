@@ -10,7 +10,7 @@ class CategoryResource extends JsonResource
     {
         return [
             'id' => $this->resource->id,
-            'title' => $this->resource->title
+            'title' => $this->resource->title,
         ];
     }
 }
