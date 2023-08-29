@@ -17,7 +17,11 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property float $price
  * @property int $quantity
  * @property boolean $is_published
- * @property string $preview_image
+ * @property string $preview_image_url
+ * @property string $preview_image_path
+ * @property Category $category
+ * @property Tag[] $tags
+ * @property Image[] $images
  */
 class Product extends Model
 {

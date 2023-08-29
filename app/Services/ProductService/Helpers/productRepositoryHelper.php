@@ -9,7 +9,7 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
-trait productHelper
+trait productRepositoryHelper
 {
     public function generateArticle(int $length = 8): string
     {
@@ -27,9 +27,20 @@ trait productHelper
     public function getProductByModel(Product $product)
     {
         return Product::query()
-            ->find($product)
+            ->find($product->id)
             ->with(['images', 'tags', 'category'])
             ->first();
+    }
+
+    public function addTagIfItDoesntExists(array $data, Product $product): void
+    {
+        $tagsToAdd = $data;
+
+        foreach ($tagsToAdd as $tagId) {
+            if (!$product->tags->contains($tagId)) {
+                $product->tags()->attach($tagId);
+            }
+        }
     }
 
     public function deleteProductImages(Product $product): bool

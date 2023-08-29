@@ -24,8 +24,11 @@ class ProductResource extends JsonResource
             'is_published' => $this->resource->is_published,
             'article' => $this->resource->article,
 
-            'images'=> ImageResource::collection($this->resource->images),
+            'preview_image' => $this->resource->preview_image_url,
+
             'category' => CategoryResource::make($this->resource->category),
+
+            'images' => ImageResource::collection($this->resource->images),
             'tags' => TagResource::collection($this->resource->tags),
         ];
     }

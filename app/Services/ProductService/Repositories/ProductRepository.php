@@ -5,16 +5,14 @@ namespace App\Services\ProductService\Repositories;
 
 use App\Models\Product;
 use App\Services\ProductService\Helpers\productFileUploader;
-use App\Services\ProductService\Helpers\productHelper;
+use App\Services\ProductService\Helpers\productRepositoryHelper;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Http\UploadedFile;
 use Illuminate\Pagination\LengthAwarePaginator;
 
 class ProductRepository
 {
-    use productHelper, productFileUploader;
+    use productRepositoryHelper, productFileUploader;
 
     public function index(): LengthAwarePaginator
     {
@@ -52,16 +50,18 @@ class ProductRepository
 
             $this->loadFiles($data['images'], $product);
 
-            $this->createProductFile($data['preview_image_path'] ?? null, $product, true);
+            $this->createProductFile($data['preview_image_path'] ?? null, $product, isPreview: true);
 
             return $product;
         });
         return $product;
     }
 
-    public function update(array $data, Product $product): Model|Builder|int
+    public function update(array $data, Product $product): Model|Builder
     {
-        transaction(function () use ($data, &$product) {
+        $result = null;
+
+        transaction(function () use ($data, &$product, &$result) {
 
             $product = $product->fill([
                 'title' => $data['title'],
@@ -73,20 +73,22 @@ class ProductRepository
                 'article' => $this->generateArticle(),
             ]);
 
-            $product->tags()->attach($data['tags']);
+            $this->addTagIfItDoesntExists($data['tags'], $product);
 
             $this->loadFiles($data['images'], $product);
 
             $this->createProductFile($data['preview_image_path'] ?? null, $product, true);
 
+            $result = $product;
+
             return $product;
         });
-        return $product;
+        return $result;
     }
 
     public function delete(Product $product): bool
     {
-        transaction(function ($product) {
+        transaction(function () use ($product) {
             $this->deleteProductImages($product);
             $product->tags()->detach();
             $product->delete();

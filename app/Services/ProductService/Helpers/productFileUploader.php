@@ -9,15 +9,24 @@ use Illuminate\Database\Eloquent\Concerns\QueriesRelationships;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use mysql_xdevapi\Exception;
 
 trait productFileUploader
 {
-    private function createFileName(UploadedFile $image): string
+    private UploadedFile $image;
+
+    private string $imagePath;
+    private string $fileName;
+    private bool $isPreview = false;
+
+    private function generateFileName(): string
     {
-        return Str::random(40) . '.' . $image->getClientOriginalExtension();
+        $this->fileName = Str::random(40) . '.' . $this->image->getClientOriginalExtension();
+
+        return $this->fileName;
     }
 
-    public function loadFiles(array $array, Product $product): array
+    private function loadFiles(array $array, Product $product): array
     {
         $images = [];
         foreach ($array as $image) {
@@ -28,38 +37,54 @@ trait productFileUploader
 
     private function createProductFile(?UploadedFile $image, Product $product, $isPreview = false): ?Image
     {
-        if ($image === null) {
-            return null;
-        }
+        if ($image === null) return null;
 
-        $fileName = $this->createFileName($image);
+        $this->setImage($image);
+        $this->setIsPreview($isPreview);
 
-        $imagePath = 'images/products/' . $fileName;
+        $this->setImagePath('images/products/' . $this->generateFileName());
+        $this->generateFileName();
 
-        Storage::disk('public')->putFileAs('images/products',
-            $image, $this->createFileName($image)
-        );
+        Storage::disk('public')->putFileAs('images/products', $this->image, $this->fileName);
 
-        return $this->createNewImageModel($imagePath, $product, $isPreview);
+        return $this->createNewImageModel($product);
     }
 
-    private function createNewImageModel(string $imagePath, Product $product, $isPreview = false): Image
+    private function createNewImageModel(Product $product): Image
     {
-        $imageUrl = 'storage/' . $imagePath;
+        $imageUrl = 'storage/' . $this->imagePath;
 
         $imageModel = new Image([
-            'path' => $imagePath,
+            'path' => $this->imagePath,
             'url' => asset($imageUrl),
             'product_id' => $product->id
         ]);
 
-        if ($isPreview) $product->update([
-            'preview_image_path' => $imagePath,
+        // если isPreview === true,
+        // тогда он будет сохранять превью-картинку
+
+        if ($this->isPreview) $product->update([
+            'preview_image_path' => $this->imagePath,
             'preview_image_url' => $imageUrl
         ]);
 
         $imageModel->save();
 
         return $imageModel;
+    }
+
+    private function setImage(?UploadedFile $image): void
+    {
+        $this->image = $image;
+    }
+
+    private function setImagePath($imagePath): void
+    {
+        $this->imagePath = $imagePath;
+    }
+
+    private function setIsPreview(bool $isPreview): void
+    {
+        $this->isPreview = $isPreview;
     }
 }
