@@ -5,23 +5,22 @@ namespace App\Services\ProductService\Repositories;
 
 use App\Models\Product;
 use App\Services\ProductService\Helpers\productFileUploader;
-use App\Services\ProductService\Helpers\productHelper;
+use App\Services\ProductService\Helpers\productRepositoryHelper;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Pagination\LengthAwarePaginator;
 
 class ProductRepository
 {
-    use productHelper, productFileUploader;
+    use productRepositoryHelper, productFileUploader;
 
-    public function index(): LengthAwarePaginator
+    public function index(array $data): LengthAwarePaginator
     {
-        $perPage = 12;
+        $perPage = 3;
 
-        return Product::query()->with([
-            'images', 'tags', 'category'
-        ])->paginate($perPage);
+        $products = Product::query()->with(['images', 'tags', 'category']);
+
+        return $products->paginate($perPage, ['*'], pageName: 'page', page: $data['page']);
     }
 
     public function show(Product $product): Model|Builder
@@ -32,47 +31,71 @@ class ProductRepository
             ->first();
     }
 
-    public function store(array $data): Model|Builder
+    public function store(array $data): Model|Builder|null
     {
-        $product = Product::query()->create([
-            'title' => $data['title'],
-            'description' => $data['description'],
-            'price' => $data['price'],
-            'quantity' => $data['quantity'],
-            'category_id' => $data['category_id'],
-            'is_published' => $data['is_published'],
-            'article' => $this->generateArticle(),
-        ]);
+        $product = null;
 
-        $product->tags()->attach($data['tags']);
-        $this->loadFiles($data['images'], $product);
+        transaction(function () use ($data, &$product) {
+            $product = Product::query()->create([
+                'title' => $data['title'],
+                'description' => $data['description'],
+                'price' => $data['price'],
+                'quantity' => $data['quantity'],
+                'category_id' => $data['category_id'],
+                'is_published' => $data['is_published'],
+                'article' => $this->generateArticle(),
+            ]);
 
+            $product->tags()->attach($data['tags']);
+
+            $this->loadFiles($data['images'], $product);
+
+            $this->createProductFile($data['preview_image_path'] ?? null, $product, isPreview: true);
+
+            return $product;
+        });
         return $product;
     }
 
     public function update(array $data, Product $product): Model|Builder
     {
-        $product::query()->update([
-            'title' => $data['title'],
-            'description' => $data['description'],
-            'price' => $data['price'],
-            'quantity' => $data['quantity'],
-            'is_published' => $data['is_published'],
-            'category_id' => $data['category_id'],
-        ]);
+        $result = null;
 
-        $this->loadFiles($data['images'], $product);
-        $product->tags()->attach($data['tags']);
+        transaction(function () use ($data, &$product, &$result) {
 
-        return $product;
+            $product = $product->fill([
+                'title' => $data['title'],
+                'description' => $data['description'],
+                'price' => $data['price'],
+                'quantity' => $data['quantity'],
+                'category_id' => $data['category_id'],
+                'is_published' => $data['is_published'],
+                'article' => $this->generateArticle(),
+            ]);
+
+            $this->addTagIfItDoesntExists($data['tags'], $product);
+
+            $this->loadFiles($data['images'], $product);
+
+            $this->createProductFile($data['preview_image_path'] ?? null, $product, true);
+
+            $result = $product;
+
+            return $product;
+        });
+        return $result;
     }
 
     public function delete(Product $product): bool
     {
-        $this->deleteProductImages($product);
-        $product->tags()->detach();
-        $product->delete();
+        transaction(function () use ($product) {
+            $this->deleteProductImages($product);
+            $product->tags()->detach();
+            $product->delete();
 
-        return true;
+            return true;
+        });
+
+        return false;
     }
 }

@@ -1,20 +1,22 @@
 <?php
 
-namespace App\Http\Requests\Tag;
+namespace App\Http\Requests\Product;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class CreateTagRequest extends FormRequest
+class IndexProductRequest extends FormRequest
 {
+
     public function authorize()
     {
         return true;
     }
 
-    public function rules(): array
+
+    public function rules()
     {
         return [
-            'title' => 'required|string|min:5'
+            'page' => 'required|integer',
         ];
     }
 }

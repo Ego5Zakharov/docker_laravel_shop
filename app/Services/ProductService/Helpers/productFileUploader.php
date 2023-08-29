@@ -1,6 +1,5 @@
 <?php
 
-
 namespace App\Services\ProductService\Helpers;
 
 use App\Models\Image;
@@ -11,12 +10,19 @@ use Illuminate\Support\Str;
 
 trait productFileUploader
 {
-    private function createFileName(UploadedFile $image): string
+    private ?UploadedFile $image = null;
+
+    private string $imagePath;
+    private string $fileName;
+    private bool $isPreview = false;
+
+    private function generateFileName(): string
     {
-        return Str::random(40) . '.' . $image->getClientOriginalExtension();
+        $this->fileName = Str::random(40) . '.' . $this->image->getClientOriginalExtension();
+        return $this->fileName;
     }
 
-    public function loadFiles(array $array, Product $product): array
+    private function loadFiles(array $array, Product $product): array
     {
         $images = [];
         foreach ($array as $image) {
@@ -25,24 +31,57 @@ trait productFileUploader
         return $images;
     }
 
-    private function createProductFile(UploadedFile $image, Product $product): Image
+    private function createProductFile(?UploadedFile $image, Product $product, $isPreview = false): ?Image
     {
-        $fileName = $this->createFileName($image);
+        if ($image === null) return null;
 
-        $imagePath = 'images/products/' . $fileName;
+        $this->setImage($image);
+        $this->setIsPreview($isPreview);
 
-        Storage::disk('public')->putFileAs('images/products',
-            $image, $this->createFileName($image)
-        );
+        $this->generateFileName();
+        $this->setImagePath('images/products/' . $this->fileName);
+
+
+        Storage::disk('public')->putFileAs('images/products', $this->image, $this->fileName);
+
+        return $this->createNewImageModel($product);
+    }
+
+    private function createNewImageModel(Product $product): Image
+    {
+        $imageUrl = '/storage/' . $this->imagePath;
 
         $imageModel = new Image([
-            'path' => $imagePath,
-            'url' => asset('storage/' . $imagePath),
+            'path' => $this->imagePath,
+            'url' => asset($imageUrl),
             'product_id' => $product->id
         ]);
 
-        $imageModel->save();
+        if ($this->isPreview) {
+            $product->update([
+                'preview_image_path' => $this->imagePath,
+                'preview_image_url' => asset($imageUrl)
+            ]);
+        }
 
+        $imageModel->save();
         return $imageModel;
+    }
+
+    private function setImage(?UploadedFile $image): void
+    {
+        if (!is_null($image)) {
+            $this->image = $image;
+        }
+    }
+
+    private function setImagePath(string $imagePath): void
+    {
+        $this->imagePath = $imagePath;
+    }
+
+    private function setIsPreview(bool $isPreview): void
+    {
+        $this->isPreview = $isPreview;
     }
 }

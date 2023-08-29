@@ -25,6 +25,7 @@ class CreateProductRequest extends FormRequest
             'tags' => 'nullable|array|min:1',
             'tags.*' => 'required|integer|min:1',
 
+            'preview_image_path' => 'nullable|file',
             'images' => 'nullable|array|min:1',
             'images.*' => 'required|file|max:2048',
             'images.*.extension' => 'in:jpg,png,gif',

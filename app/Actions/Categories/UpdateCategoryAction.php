@@ -11,7 +11,7 @@ class UpdateCategoryAction
 {
     public function run(CategoryData $data, Category $category): Model|Collection|Builder|array|null
     {
-        $category->query()->update(['title' => $data->title]);
+        $category->update(['title' => $data->title]);
 
         return Category::query()->find($category->id);
     }

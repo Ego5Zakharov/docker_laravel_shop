@@ -17,6 +17,11 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property float $price
  * @property int $quantity
  * @property boolean $is_published
+ * @property string $preview_image_url
+ * @property string $preview_image_path
+ * @property Category $category
+ * @property Tag[] $tags
+ * @property Image[] $images
  */
 class Product extends Model
 {
@@ -27,6 +32,7 @@ class Product extends Model
     protected $fillable = [
         'title', 'description', 'article',
         'price', 'quantity',
+        'preview_image_path', 'preview_image_url',
         'is_published', 'category_id'
     ];
 
@@ -34,7 +40,6 @@ class Product extends Model
         'price' => 'integer',
         'is_published' => 'boolean',
     ];
-
 
 
     public function category(): belongsTo
@@ -62,4 +67,9 @@ class Product extends Model
             'product_id',
             'id');
     }
+
+//    public function getPreviewImageUrlAttribute()
+//    {
+//        return url('storage')
+//    }
 }
