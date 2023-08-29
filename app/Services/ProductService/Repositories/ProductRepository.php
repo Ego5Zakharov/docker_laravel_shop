@@ -14,13 +14,13 @@ class ProductRepository
 {
     use productRepositoryHelper, productFileUploader;
 
-    public function index(): LengthAwarePaginator
+    public function index(array $data): LengthAwarePaginator
     {
-        $perPage = 12;
+        $perPage = 3;
 
-        return Product::query()->with([
-            'images', 'tags', 'category'
-        ])->paginate($perPage);
+        $products = Product::query()->with(['images', 'tags', 'category']);
+
+        return $products->paginate($perPage, ['*'], pageName: 'page', page: $data['page']);
     }
 
     public function show(Product $product): Model|Builder

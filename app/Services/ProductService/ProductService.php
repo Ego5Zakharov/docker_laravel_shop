@@ -17,9 +17,9 @@ class ProductService
         $this->productRepository = $productRepository;
     }
 
-    public function index(): LengthAwarePaginator
+    public function index(array $data): LengthAwarePaginator
     {
-        return $this->productRepository->index();
+        return $this->productRepository->index($data);
     }
 
     public function show(Product $product)

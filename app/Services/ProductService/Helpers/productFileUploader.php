@@ -1,19 +1,16 @@
 <?php
 
-
 namespace App\Services\ProductService\Helpers;
 
 use App\Models\Image;
 use App\Models\Product;
-use Illuminate\Database\Eloquent\Concerns\QueriesRelationships;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
-use mysql_xdevapi\Exception;
 
 trait productFileUploader
 {
-    private UploadedFile $image;
+    private ?UploadedFile $image = null;
 
     private string $imagePath;
     private string $fileName;
@@ -22,7 +19,6 @@ trait productFileUploader
     private function generateFileName(): string
     {
         $this->fileName = Str::random(40) . '.' . $this->image->getClientOriginalExtension();
-
         return $this->fileName;
     }
 
@@ -42,8 +38,9 @@ trait productFileUploader
         $this->setImage($image);
         $this->setIsPreview($isPreview);
 
-        $this->setImagePath('images/products/' . $this->generateFileName());
         $this->generateFileName();
+        $this->setImagePath('images/products/' . $this->fileName);
+
 
         Storage::disk('public')->putFileAs('images/products', $this->image, $this->fileName);
 
@@ -52,7 +49,7 @@ trait productFileUploader
 
     private function createNewImageModel(Product $product): Image
     {
-        $imageUrl = 'storage/' . $this->imagePath;
+        $imageUrl = '/storage/' . $this->imagePath;
 
         $imageModel = new Image([
             'path' => $this->imagePath,
@@ -60,25 +57,25 @@ trait productFileUploader
             'product_id' => $product->id
         ]);
 
-        // если isPreview === true,
-        // тогда он будет сохранять превью-картинку
-
-        if ($this->isPreview) $product->update([
-            'preview_image_path' => $this->imagePath,
-            'preview_image_url' => $imageUrl
-        ]);
+        if ($this->isPreview) {
+            $product->update([
+                'preview_image_path' => $this->imagePath,
+                'preview_image_url' => asset($imageUrl)
+            ]);
+        }
 
         $imageModel->save();
-
         return $imageModel;
     }
 
     private function setImage(?UploadedFile $image): void
     {
-        $this->image = $image;
+        if (!is_null($image)) {
+            $this->image = $image;
+        }
     }
 
-    private function setImagePath($imagePath): void
+    private function setImagePath(string $imagePath): void
     {
         $this->imagePath = $imagePath;
     }

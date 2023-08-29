@@ -67,4 +67,9 @@ class Product extends Model
             'product_id',
             'id');
     }
+
+//    public function getPreviewImageUrlAttribute()
+//    {
+//        return url('storage')
+//    }
 }
