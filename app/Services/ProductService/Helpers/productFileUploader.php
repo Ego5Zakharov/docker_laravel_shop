@@ -22,8 +22,11 @@ trait productFileUploader
         return $this->fileName;
     }
 
-    private function loadFiles(array $array, Product $product): array
+    private function loadFiles(?array $array, Product $product): bool|array
     {
+        if (!isset($array)) {
+            return false;
+        }
         $images = [];
         foreach ($array as $image) {
             $images[] = $this->createProductFile($image, $product);
@@ -31,9 +34,9 @@ trait productFileUploader
         return $images;
     }
 
-    private function createProductFile(?UploadedFile $image, Product $product, $isPreview = false): ?Image
+    private function createProductFile(UploadedFile|string $image, Product $product, $isPreview = false): Image|int|bool
     {
-        if ($image === null) return null;
+        if (!$image instanceof UploadedFile) return true;
 
         $this->setImage($image);
         $this->setIsPreview($isPreview);
@@ -41,11 +44,11 @@ trait productFileUploader
         $this->generateFileName();
         $this->setImagePath('images/products/' . $this->fileName);
 
-
         Storage::disk('public')->putFileAs('images/products', $this->image, $this->fileName);
 
         return $this->createNewImageModel($product);
     }
+
 
     private function createNewImageModel(Product $product): Image
     {

@@ -18,17 +18,20 @@ class CreateProductRequest extends FormRequest
             'description' => 'required|string|min:5',
             'price' => 'required|numeric',
             'quantity' => 'required|integer',
-            'is_published' => 'nullable|boolean',
+            'is_published' => 'nullable|in:0,1',
 
             'category_id' => 'nullable|int',
 
             'tags' => 'nullable|array|min:1',
             'tags.*' => 'required|integer|min:1',
 
-            'preview_image_path' => 'nullable|file',
+            'preview_image_path' => 'nullable',
+
             'images' => 'nullable|array|min:1',
-            'images.*' => 'required|file|max:2048',
-            'images.*.extension' => 'in:jpg,png,gif',
+            'images.*' => 'required|file|max:12048',
+//            'images.*.extension' => 'in:jpg,png,gif',
         ];
     }
+
+
 }

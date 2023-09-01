@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Facade;
  * @method static delete(Product $product)
  * @method static index(array $validated)
  * @method static show(Product $product)
+ * @method static create()
  */
 class ProductFacade extends Facade
 {
