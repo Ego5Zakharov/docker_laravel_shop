@@ -7,6 +7,7 @@ use App\Services\ProductService\Repositories\ProductRepository;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Collection;
 
 class ProductService
 {
@@ -15,6 +16,11 @@ class ProductService
     public function __construct(ProductRepository $productRepository)
     {
         $this->productRepository = $productRepository;
+    }
+
+    public function create(): Collection
+    {
+        return $this->productRepository->create();
     }
 
     public function index(array $data): LengthAwarePaginator

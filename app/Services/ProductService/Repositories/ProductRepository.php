@@ -3,16 +3,20 @@
 
 namespace App\Services\ProductService\Repositories;
 
+use App\Models\Category;
 use App\Models\Product;
+use App\Models\Tag;
 use App\Services\ProductService\Helpers\productFileUploader;
 use App\Services\ProductService\Helpers\productRepositoryHelper;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Collection;
 
 class ProductRepository
 {
     use productRepositoryHelper, productFileUploader;
+
 
     public function index(array $data): LengthAwarePaginator
     {
@@ -21,6 +25,17 @@ class ProductRepository
         $products = Product::query()->with(['images', 'tags', 'category']);
 
         return $products->paginate($perPage, ['*'], pageName: 'page', page: $data['page']);
+    }
+
+    public function create(): Collection
+    {
+        $categories = Category::all();
+        $tags = Tag::all();
+
+        return collect([
+            'categories' => $categories,
+            'tags' => $tags
+        ]);
     }
 
     public function show(Product $product): Model|Builder
@@ -46,9 +61,9 @@ class ProductRepository
                 'article' => $this->generateArticle(),
             ]);
 
-            $product->tags()->attach($data['tags']);
+            $this->addTagIfItDoesntExists($data['tags'] ?? null, $product);
 
-            $this->loadFiles($data['images'], $product);
+            $this->loadFiles($data['images'] ?? null, $product);
 
             $this->createProductFile($data['preview_image_path'] ?? null, $product, isPreview: true);
 
@@ -70,12 +85,13 @@ class ProductRepository
                 'quantity' => $data['quantity'],
                 'category_id' => $data['category_id'],
                 'is_published' => $data['is_published'],
-                'article' => $this->generateArticle(),
             ]);
 
-            $this->addTagIfItDoesntExists($data['tags'], $product);
+            $product->save();
 
-            $this->loadFiles($data['images'], $product);
+            $this->addTagIfItDoesntExists($data['tags'] ?? null, $product);
+
+            $this->loadFiles($data['images'] ?? null, $product);
 
             $this->createProductFile($data['preview_image_path'] ?? null, $product, true);
 

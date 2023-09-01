@@ -32,8 +32,11 @@ trait productRepositoryHelper
             ->first();
     }
 
-    public function addTagIfItDoesntExists(array $data, Product $product): void
+    public function addTagIfItDoesntExists(?array $data, Product $product): bool
     {
+        if(!isset($data)){
+           return false;
+        }
         $tagsToAdd = $data;
 
         foreach ($tagsToAdd as $tagId) {
@@ -41,6 +44,7 @@ trait productRepositoryHelper
                 $product->tags()->attach($tagId);
             }
         }
+        return true;
     }
 
     public function deleteProductImages(Product $product): bool

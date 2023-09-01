@@ -7,6 +7,7 @@ use App\Http\Requests\Product\CreateProductRequest;
 use App\Http\Requests\Product\IndexProductRequest;
 use App\Http\Requests\Product\UpdateProductRequest;
 use App\Http\Resources\Product\ProductResource;
+use App\Http\Resources\Products\CreateProductDataResource;
 use App\Models\Product;
 use App\Services\ProductService\Facades\ProductFacade;
 use Illuminate\Http\JsonResponse;
@@ -21,6 +22,11 @@ class ProductController extends Controller
         return ProductResource::collection(
             ProductFacade::index($data)
         );
+    }
+
+    public function create()
+    {
+        return CreateProductDataResource::make(ProductFacade::create());
     }
 
     public function show(Product $product): ProductResource
