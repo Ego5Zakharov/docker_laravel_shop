@@ -33,4 +33,9 @@ Route::group(['namespace' => 'Product', 'prefix' => 'products'], function () {
     Route::post('/', [ProductController::class, 'store']);
     Route::post('/{product}/update', [ProductController::class, 'update']); // form-data в postman не работает с patch(не принимает картинки)
     Route::delete('/{product}', [ProductController::class, 'delete']);
+
+    Route::delete('/{product}/{tag}/detachTag', [ProductController::class, 'detachTag']);
+    Route::delete('/{product}/{image}/deleteProductImage', [ProductController::class, 'deleteProductImage']);
+    Route::patch('/{product}/deleteProductPreviewImage', [ProductController::class, 'deleteProductPreviewImage']);
+    Route::patch('/{product}/{image}/changeProductPreviewImage', [ProductController::class, 'changeProductPreviewImage']);
 });

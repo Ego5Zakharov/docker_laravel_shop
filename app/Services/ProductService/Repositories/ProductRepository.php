@@ -4,6 +4,7 @@
 namespace App\Services\ProductService\Repositories;
 
 use App\Models\Category;
+use App\Models\Image;
 use App\Models\Product;
 use App\Models\Tag;
 use App\Services\ProductService\Helpers\productFileUploader;
@@ -113,5 +114,31 @@ class ProductRepository
         });
 
         return false;
+    }
+
+    public function detachTag(Product $product, Tag $tag): void
+    {
+        if (!$product->tags->contains($tag)) {
+            throw new \InvalidArgumentException('Тег не связан с данным товаром');
+        }
+        $product->tags()->detach($tag->id);
+    }
+
+    public function deleteProductImage(Product $product, Image $image): void
+    {
+        if (!$product->images->contains($image)) {
+            throw new \InvalidArgumentException('Картинка не связана с данным товаром');
+        }
+        $this->deleteProductImageDB($image);
+    }
+
+    public function deleteProductPreviewImage(Product $product): void
+    {
+        $this->deleteProductPreviewImageDB($product);
+    }
+
+    public function changeProductPreviewImage(Product $product, Image $image): ?array
+    {
+        return $this->changeProductPreviewImageDB($product, $image);
     }
 }
