@@ -30,8 +30,8 @@ class ProductRepository
 
     public function create(): Collection
     {
-        $categories = Category::all();
-        $tags = Tag::all();
+        $categories = Category::query()->get(['id', 'title'])->all();
+        $tags = Tag::query()->get(['id', 'title'])->all();
 
         return collect([
             'categories' => $categories,
@@ -105,15 +105,13 @@ class ProductRepository
 
     public function delete(Product $product): bool
     {
-        transaction(function () use ($product) {
+        return transaction(function () use ($product) {
             $this->deleteProductImages($product);
             $product->tags()->detach();
             $product->delete();
 
             return true;
         });
-
-        return false;
     }
 
     public function detachTag(Product $product, Tag $tag): void
@@ -129,7 +127,7 @@ class ProductRepository
         if (!$product->images->contains($image)) {
             throw new \InvalidArgumentException('Картинка не связана с данным товаром');
         }
-        $this->deleteProductImageDB($image);
+        $this->deleteProductImageDB($product, $image);
     }
 
     public function deleteProductPreviewImage(Product $product): void

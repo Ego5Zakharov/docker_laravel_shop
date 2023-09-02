@@ -34,7 +34,7 @@ trait productFileUploader
         return $images;
     }
 
-    private function createProductFile(UploadedFile|string $image, Product $product, $isPreview = false): Image|int|bool
+    private function createProductFile(null|UploadedFile|string $image, Product $product, $isPreview = false): Image|int|bool
     {
         if (!$image instanceof UploadedFile) return true;
 
