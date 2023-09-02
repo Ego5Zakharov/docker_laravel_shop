@@ -2,7 +2,9 @@
 
 namespace App\Services\ProductService;
 
+use App\Models\Image;
 use App\Models\Product;
+use App\Models\Tag;
 use App\Services\ProductService\Repositories\ProductRepository;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
@@ -46,5 +48,25 @@ class ProductService
     public function delete(Product $product): bool
     {
         return $this->productRepository->delete($product);
+    }
+
+    public function detachTag(Product $product, Tag $tag): void
+    {
+        $this->productRepository->detachTag($product, $tag);
+    }
+
+    public function deleteProductImage(Product $product, Image $image): void
+    {
+        $this->productRepository->deleteProductImage($product, $image);
+    }
+
+    public function deleteProductPreviewImage(Product $product): void
+    {
+        $this->productRepository->deleteProductPreviewImage($product);
+    }
+
+    public function changeProductPreviewImageDB(Product $product, Image $image): ?array
+    {
+        return $this->productRepository->changeProductPreviewImage($product, $image);
     }
 }

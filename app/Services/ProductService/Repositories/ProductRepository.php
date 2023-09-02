@@ -4,6 +4,7 @@
 namespace App\Services\ProductService\Repositories;
 
 use App\Models\Category;
+use App\Models\Image;
 use App\Models\Product;
 use App\Models\Tag;
 use App\Services\ProductService\Helpers\productFileUploader;
@@ -29,8 +30,8 @@ class ProductRepository
 
     public function create(): Collection
     {
-        $categories = Category::all();
-        $tags = Tag::all();
+        $categories = Category::query()->get(['id', 'title'])->all();
+        $tags = Tag::query()->get(['id', 'title'])->all();
 
         return collect([
             'categories' => $categories,
@@ -104,14 +105,38 @@ class ProductRepository
 
     public function delete(Product $product): bool
     {
-        transaction(function () use ($product) {
+        return transaction(function () use ($product) {
             $this->deleteProductImages($product);
             $product->tags()->detach();
             $product->delete();
 
             return true;
         });
+    }
 
-        return false;
+    public function detachTag(Product $product, Tag $tag): void
+    {
+        if (!$product->tags->contains($tag)) {
+            throw new \InvalidArgumentException('Тег не связан с данным товаром');
+        }
+        $product->tags()->detach($tag->id);
+    }
+
+    public function deleteProductImage(Product $product, Image $image): void
+    {
+        if (!$product->images->contains($image)) {
+            throw new \InvalidArgumentException('Картинка не связана с данным товаром');
+        }
+        $this->deleteProductImageDB($product, $image);
+    }
+
+    public function deleteProductPreviewImage(Product $product): void
+    {
+        $this->deleteProductPreviewImageDB($product);
+    }
+
+    public function changeProductPreviewImage(Product $product, Image $image): ?array
+    {
+        return $this->changeProductPreviewImageDB($product, $image);
     }
 }

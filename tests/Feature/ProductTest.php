@@ -1,11 +1,14 @@
 <?php
 
 
+use App\Http\Resources\Products\CreateProductDataResource;
 use App\Models\Category;
 use App\Models\Image;
 use App\Models\Product;
 use App\Models\Tag;
-use App\Services\ProductService\Helpers\productHelper;
+use App\Services\ProductService\Facades\ProductFacade;
+use App\Services\ProductService\Helpers\productFileUploader;
+use App\Services\ProductService\Helpers\productRepositoryHelper;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
@@ -13,13 +16,85 @@ use Tests\TestCase;
 
 class ProductTest extends TestCase
 {
-    use RefreshDatabase, productHelper;
+    use RefreshDatabase, productRepositoryHelper, productFileUploader;
 
     protected function setUp(): void
     {
         parent::setUp();
         Storage::fake('public');
         $this->withHeaders(['accept' => 'application/json']);
+    }
+
+    /** @test */
+    public function test_product_create_data_categories_and_tags()
+    {
+        $this->withoutExceptionHandling();
+
+        Category::factory(10)->create();
+        Tag::factory(10)->create();
+
+        $res = $this->get('/api/products/create');
+
+        $res->assertOk();
+
+        $formattedData = CreateProductDataResource::make(ProductFacade::create())
+            ->toArray(null);
+
+        $res->assertExactJson([
+            'data' => $formattedData,
+        ]);
+    }
+
+    /** @test */
+    public function test_product_tag_can_be_detaching()
+    {
+        $this->withoutExceptionHandling();
+
+        $product = Product::factory()
+            ->has(Tag::factory()->count(2))
+            ->create();
+
+        $tag = $product->tags[0];
+
+        $res = $this->delete("/api/products/{$product->id}/{$tag->id}/detachTag");
+
+        $res->assertOk();
+
+        $this->assertCount(1, $product->tags()->get()->all());
+    }
+
+    /** @test */
+    public function test_product_image_cant_be_deleted_if_it_not_in_storage()
+    {
+        $product = Product::factory()
+            ->has(Image::factory()->count(2))
+            ->create();
+
+        $image = $product->images[0];
+
+        $res = $this->delete("/api/products/{$product->id}/{$image->id}/deleteProductImage");
+
+        $res->assertOk();
+
+        $this->assertCount(2, $product->images()->get()->all());
+    }
+
+    /** @test */
+    public function test_post_can_be_change_preview_image()
+    {
+        $product = Product::factory()
+            ->has(Image::factory()->count(1))
+            ->create();
+
+        $image = $product->images()->first();
+
+        $res = $this->patch("/api/products/{$product->id}/{$image->id}/changeProductPreviewImage");
+        $res->assertOk();
+
+        $product = Product::query()->first();
+
+        $this->assertEquals($product->preview_image_url, $image->url);
+        $this->assertEquals($product->preview_image_path, $image->path);
     }
 
     /** @test */
@@ -33,7 +108,7 @@ class ProductTest extends TestCase
 
         $images = [
             UploadedFile::fake()->create('image_1.png', 400, 'png'),
-            UploadedFile::fake()->create('image_1.png', 400, 'png'),
+            UploadedFile::fake()->create('image_2.png', 400, 'png'),
         ];
 
         $data = [
@@ -137,7 +212,7 @@ class ProductTest extends TestCase
             ->create()
             ->toArray();
 
-        $res = $this->get('/api/products/', $products);
+        $res = $this->post('/api/products/index', ['page' => 1]);
 
         $res->assertOk();
 
@@ -147,7 +222,6 @@ class ProductTest extends TestCase
 
             $product = Product::query()->with(['category', 'tags', 'images'])->find($productData['id']);
 
-            // Modify the structure of the expected JSON here
             return [
                 'id' => $product->id,
                 'title' => $product->title,
@@ -177,7 +251,25 @@ class ProductTest extends TestCase
         })->toArray();
 
         $res->assertJson([
-            'data' => $json
+            'data' => $json,
+        ]);
+        $res->assertJsonStructure([
+            'data' => [],
+            'links' => [
+                'first',
+                'last',
+                'prev',
+                'next',
+            ],
+            'meta' => [
+                'current_page',
+                'from',
+                'last_page',
+                'path',
+                'per_page',
+                'to',
+                'total',
+            ],
         ]);
     }
 

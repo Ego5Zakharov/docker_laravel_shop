@@ -4,11 +4,12 @@ namespace Database\Factories;
 
 use App\Models\Category;
 use App\Services\ProductService\Helpers\productHelper;
+use App\Services\ProductService\Helpers\productRepositoryHelper;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class ProductFactory extends Factory
 {
-    use productHelper;
+    use productRepositoryHelper;
 
     public function definition()
     {
@@ -20,6 +21,8 @@ class ProductFactory extends Factory
             'is_published' => true,
             'article' => $this->generateArticle(),
             'category_id' => Category::factory(),
+            'preview_image_url' => $this->withFaker()->imageUrl,
+            'preview_image_path' =>  $this->withFaker()->filePath(),
         ];
     }
 }

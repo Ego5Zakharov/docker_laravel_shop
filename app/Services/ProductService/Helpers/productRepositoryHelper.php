@@ -34,8 +34,8 @@ trait productRepositoryHelper
 
     public function addTagIfItDoesntExists(?array $data, Product $product): bool
     {
-        if(!isset($data)){
-           return false;
+        if (!isset($data)) {
+            return false;
         }
         $tagsToAdd = $data;
 
@@ -60,5 +60,42 @@ trait productRepositoryHelper
         $product->images()->delete();
 
         return true;
+    }
+
+    public function deleteProductImageDB(Product $product, Image $image): void
+    {
+        if (Storage::exists($image->path)) {
+            Storage::delete($image->path);
+
+            $image->delete();
+        }
+    }
+
+    public function deleteProductPreviewImageDB(Product $product): void
+    {
+        if ($product->preview_image_path && $product->preview_image_url) {
+            $product->fill([
+                'preview_image_path' => null,
+                'preview_image_url' => null
+            ])->save();
+        }
+    }
+
+    public function changeProductPreviewImageDB(Product $product, Image $image): ?array
+    {
+        if (isset($image->url) && isset($image->path)) {
+            $product->fill([
+                'preview_image_url' => $image->url,
+                'preview_image_path' => $image->path,
+            ]);
+
+            $product->save();
+
+            return [
+                'url' => $image->url,
+                'path' => $image->path
+            ];
+        }
+        return null;
     }
 }
