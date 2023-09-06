@@ -2,15 +2,24 @@
 
 namespace App\Models;
 
-use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Traits\userAuthorizationHelper;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Tymon\JWTAuth\Contracts\JWTSubject;
 
-class User extends Authenticatable
+/**
+ * @property int $id
+ * @property string $name
+ * @property string $email
+ * @property string $password
+ * @property string $remember_token
+ * @property Role $roles;
+ */
+class User extends Authenticatable implements JWTSubject
 {
-    use HasFactory, Notifiable;
-
+    use HasFactory, Notifiable, userAuthorizationHelper;
 
     protected $fillable = [
         'name',
@@ -23,8 +32,30 @@ class User extends Authenticatable
         'remember_token',
     ];
 
-
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        self::created(function ($user) {
+            $userRole = Role::query()->where('name', '=', 'user')->first();
+            if ($userRole) {
+                $user->roles()->attach($userRole->id);
+            }
+        });
+    }
+
+
+    public function roles(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            Role::class,
+            'user_roles',
+            'user_id',
+            'role_id');
+    }
+
 }
