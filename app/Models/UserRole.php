@@ -7,14 +7,12 @@ use Illuminate\Database\Eloquent\Model;
 
 /**
  * @property int $id,
- * @property int $product_id
- * @property int $tag_id
+ * @property int $user_id
+ * @property int $role_id
  */
-class ProductTag extends Model
+class UserRole extends Model
 {
     use HasFactory;
 
-    protected $table = 'products_tag';
-
-    protected $fillable = ['product_id', 'tag_id'];
+    protected $table = ['user_roles'];
 }

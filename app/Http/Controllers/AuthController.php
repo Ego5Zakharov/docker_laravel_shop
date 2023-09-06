@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 
 class AuthController extends Controller
 {
@@ -49,10 +50,23 @@ class AuthController extends Controller
      */
     public function logout(): \Illuminate\Http\JsonResponse
     {
+        $userId = auth()->user()->id;
+
+        $user_roles_cache_key = "user_roles_{$userId}";
+        $user_permissions_key = "user_permissions_{$userId}";
+
+        if (Cache::has($user_roles_cache_key)) {
+            Cache::forget($user_roles_cache_key);
+        }
+        if (Cache::has($user_permissions_key)) {
+            Cache::forget($user_permissions_key);
+        }
+        
         auth()->logout();
 
         return response()->json(['message' => 'Successfully logged out']);
     }
+
 
     /**
      * Refresh a token.
@@ -73,9 +87,11 @@ class AuthController extends Controller
      */
     protected function respondWithToken($token): \Illuminate\Http\JsonResponse
     {
+        $permissions = auth()->user()->getAllPermissions();
         return response()->json([
             'access_token' => $token,
             'token_type' => 'bearer',
+            'permissions' => $permissions,
             'expires_in' => auth()->factory()->getTTL() * 60
         ]);
     }

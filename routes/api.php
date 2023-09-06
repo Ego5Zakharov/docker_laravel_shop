@@ -2,14 +2,12 @@
 
 use App\Http\Controllers\Auth\Register\RegisterController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\PermissionController;
+use App\Http\Controllers\RoleController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\TagController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\Product\ProductController;
-
-//Route::middleware('auth:api')->get('/user', function (Request $request) {
-//    return $request->user();
-//});
 
 Route::group(['middleware' => 'api', 'prefix' => 'auth'], function ($router) {
     Route::post('/register', [RegisterController::class, 'register']);
@@ -17,6 +15,9 @@ Route::group(['middleware' => 'api', 'prefix' => 'auth'], function ($router) {
     Route::post('logout', [AuthController::class, 'logout']);
     Route::post('refresh', [AuthController::class, 'refresh']);
     Route::post('me', [AuthController::class, 'me']);
+
+    Route::get('/permissions/', [PermissionController::class, 'getPermissions']);
+    Route::get('/roles/', [RoleController::class, 'getRoles']);
 
     Route::group([
         'namespace' => 'Tag',
@@ -35,11 +36,11 @@ Route::group(['middleware' => 'api', 'prefix' => 'auth'], function ($router) {
         'middleware' => 'jwt.auth',
         'prefix' => 'categories'],
         function () {
-            Route::post('/index', [CategoryController::class, 'index']);
-            Route::post('/', [CategoryController::class, 'store']);
-            Route::get('/{category}', [CategoryController::class, 'show']);
-            Route::patch('/{category}', [CategoryController::class, 'update']);
-            Route::delete('/{category}', [CategoryController::class, 'delete']);
+            Route::post('/index', [CategoryController::class, 'index'])->middleware('checkApiPermission:index categories');
+            Route::post('/', [CategoryController::class, 'store'])->middleware('checkApiPermission:store categories');;
+            Route::get('/{category}', [CategoryController::class, 'show'])->middleware('checkApiPermission:show categories');;
+            Route::patch('/{category}', [CategoryController::class, 'update'])->middleware('checkApiPermission:update categories');;
+            Route::delete('/{category}', [CategoryController::class, 'delete'])->middleware('checkApiPermission:delete categories');;
         });
 
 

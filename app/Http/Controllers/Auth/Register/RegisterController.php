@@ -16,7 +16,6 @@ class RegisterController extends Controller
     {
         $validated = $request->validated();
 
-
         if (User::query()->where('email', $validated['email'])->first()) {
             return \response()->json(['message' => 'User with this email already exists']);
         }
