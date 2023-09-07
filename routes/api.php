@@ -24,11 +24,20 @@ Route::group(['middleware' => 'api', 'prefix' => 'auth'], function ($router) {
         'middleware' => 'jwt.auth',
         'prefix' => 'tags'],
         function () {
-            Route::post('/index', [TagController::class, 'index']);
-            Route::post('/', [TagController::class, 'store']);
-            Route::get('/{tag}', [TagController::class, 'show']);
-            Route::patch('/{tag}', [TagController::class, 'update']);
-            Route::delete('/{tag}', [TagController::class, 'delete']);
+            Route::post('/index', [TagController::class, 'index'])
+                ->middleware('checkApiPermission:index tags');
+
+            Route::post('/', [TagController::class, 'store'])
+                ->middleware('checkApiPermission:store tags');
+
+            Route::get('/{tag}', [TagController::class, 'show'])
+                ->middleware('checkApiPermission:show tags');
+
+            Route::patch('/{tag}', [TagController::class, 'update'])
+                ->middleware('checkApiPermission:update tags');
+            
+            Route::delete('/{tag}', [TagController::class, 'delete'])
+                ->middleware('checkApiPermission:delete tags');
         });
 
     Route::group([
@@ -36,11 +45,16 @@ Route::group(['middleware' => 'api', 'prefix' => 'auth'], function ($router) {
         'middleware' => 'jwt.auth',
         'prefix' => 'categories'],
         function () {
-            Route::post('/index', [CategoryController::class, 'index'])->middleware('checkApiPermission:index categories');
-            Route::post('/', [CategoryController::class, 'store'])->middleware('checkApiPermission:store categories');;
-            Route::get('/{category}', [CategoryController::class, 'show'])->middleware('checkApiPermission:show categories');;
-            Route::patch('/{category}', [CategoryController::class, 'update'])->middleware('checkApiPermission:update categories');;
-            Route::delete('/{category}', [CategoryController::class, 'delete'])->middleware('checkApiPermission:delete categories');;
+            Route::post('/index', [CategoryController::class, 'index'])
+                ->middleware('checkApiPermission:index categories');
+            Route::post('/', [CategoryController::class, 'store'])
+                ->middleware('checkApiPermission:store categories');
+            Route::get('/{category}', [CategoryController::class, 'show'])
+                ->middleware('checkApiPermission:show categories');
+            Route::patch('/{category}', [CategoryController::class, 'update'])
+                ->middleware('checkApiPermission:update categories');
+            Route::delete('/{category}', [CategoryController::class, 'delete'])
+                ->middleware('checkApiPermission:delete categories');
         });
 
 
@@ -49,19 +63,35 @@ Route::group(['middleware' => 'api', 'prefix' => 'auth'], function ($router) {
         'middleware' => 'jwt.auth',
         'prefix' => 'products'],
         function () {
-            Route::post('/index', [ProductController::class, 'index']);
+            Route::post('/index', [ProductController::class, 'index'])
+                ->middleware('checkApiPermission:index products');
 
-            Route::get('/create', [ProductController::class, 'create']);
+            Route::get('/create', [ProductController::class, 'create'])
+                ->middleware('checkApiPermission:create products');
 
-            Route::get('/{product}', [ProductController::class, 'show']);
-            Route::post('/', [ProductController::class, 'store']);
-            Route::post('/{product}/update', [ProductController::class, 'update']); // form-data в postman не работает с patch(не принимает картинки)
-            Route::delete('/{product}', [ProductController::class, 'delete']);
+            Route::get('/{product}', [ProductController::class, 'show'])
+                ->middleware('checkApiPermission:show products');
 
-            Route::delete('/{product}/{tag}/detachTag', [ProductController::class, 'detachTag']);
-            Route::delete('/{product}/{image}/deleteProductImage', [ProductController::class, 'deleteProductImage']);
-            Route::patch('/{product}/deleteProductPreviewImage', [ProductController::class, 'deleteProductPreviewImage']);
-            Route::patch('/{product}/{image}/changeProductPreviewImage', [ProductController::class, 'changeProductPreviewImage']);
+            Route::post('/', [ProductController::class, 'store'])
+                ->middleware('checkApiPermission:store products');
+
+            Route::post('/{product}/update', [ProductController::class, 'update'])
+                ->middleware('checkApiPermission:update products'); // form-data в postman не работает с patch(не принимает картинки)
+
+            Route::delete('/{product}', [ProductController::class, 'delete'])
+                ->middleware('checkApiPermission:delete products');
+
+            Route::delete('/{product}/{tag}/detachTag', [ProductController::class, 'detachTag'])
+                ->middleware('checkApiPermission:detachTag products');
+
+            Route::delete('/{product}/{image}/deleteProductImage', [ProductController::class, 'deleteProductImage'])
+                ->middleware('checkApiPermission:deleteProductImage products');
+
+            Route::patch('/{product}/deleteProductPreviewImage', [ProductController::class, 'deleteProductPreviewImage'])
+                ->middleware('checkApiPermission:deleteProductPreviewImage products');
+
+            Route::patch('/{product}/{image}/changeProductPreviewImage', [ProductController::class, 'changeProductPreviewImage'])
+                ->middleware('checkApiPermission:changeProductPreviewImage products');
         });
 
 });

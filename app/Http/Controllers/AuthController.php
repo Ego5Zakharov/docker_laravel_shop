@@ -61,7 +61,7 @@ class AuthController extends Controller
         if (Cache::has($user_permissions_key)) {
             Cache::forget($user_permissions_key);
         }
-        
+
         auth()->logout();
 
         return response()->json(['message' => 'Successfully logged out']);
@@ -87,11 +87,9 @@ class AuthController extends Controller
      */
     protected function respondWithToken($token): \Illuminate\Http\JsonResponse
     {
-        $permissions = auth()->user()->getAllPermissions();
         return response()->json([
             'access_token' => $token,
             'token_type' => 'bearer',
-            'permissions' => $permissions,
             'expires_in' => auth()->factory()->getTTL() * 60
         ]);
     }
