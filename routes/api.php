@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Auth\Register\RegisterController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\PermissionController;
@@ -35,7 +36,7 @@ Route::group(['middleware' => 'api', 'prefix' => 'auth'], function ($router) {
 
             Route::patch('/{tag}', [TagController::class, 'update'])
                 ->middleware('checkApiPermission:update tags');
-            
+
             Route::delete('/{tag}', [TagController::class, 'delete'])
                 ->middleware('checkApiPermission:delete tags');
         });
@@ -94,4 +95,12 @@ Route::group(['middleware' => 'api', 'prefix' => 'auth'], function ($router) {
                 ->middleware('checkApiPermission:changeProductPreviewImage products');
         });
 
+    Route::group([
+        'namespace' => 'User',
+        'middleware' => 'jwt.auth',
+        'prefix' => 'users'
+    ], function () {
+        Route::post('/index', [UserController::class, 'index'])->middleware('checkApiPermission:index users');
+        Route::get('/{user}/show/', [UserController::class, 'show'])->middleware('checkApiPermission:show users');
+    });
 });

@@ -33,6 +33,7 @@ class InstallPermissionsCommand extends Command
         $this->createTagPermissions();
         $this->createCategoryPermissions();
         $this->createProductPermissions();
+        $this->createUserPermissions();
 
         $allPermissions = Permission::query()->get();
 
@@ -55,6 +56,14 @@ class InstallPermissionsCommand extends Command
             ->firstOrCreate(['name' => 'update categories'])
             ->firstOrCreate(['name' => 'delete categories'])
             ->firstOrCreate(['name' => 'show categories']);
+    }
+
+    private function createUserPermissions(): void
+    {
+        // users
+        Permission::query()
+            ->firstOrCreate(['name' => 'index users'])
+            ->firstOrCreate(['name' => 'show users']);
     }
 
     private function createTagPermissions(): void

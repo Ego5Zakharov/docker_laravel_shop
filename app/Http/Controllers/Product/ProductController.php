@@ -25,6 +25,7 @@ class ProductController extends Controller
     public function index(IndexProductRequest $request): AnonymousResourceCollection
     {
         $this->authorize('index', Product::class);
+
         $data = $request->validated();
 
         return ProductResource::collection(
