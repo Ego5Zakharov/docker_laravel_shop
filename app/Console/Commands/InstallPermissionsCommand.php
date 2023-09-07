@@ -25,19 +25,15 @@ class InstallPermissionsCommand extends Command
 
     private function installPermissions(): void
     {
-        // categories
-        Permission::query()
-            ->firstOrCreate(['name' => 'index categories'])
-            ->firstOrCreate(['name' => 'create categories'])
-            ->firstOrCreate(['name' => 'update categories'])
-            ->firstOrCreate(['name' => 'delete categories'])
-            ->firstOrCreate(['name' => 'show categories']);
-        // tags
-        Permission::query()
-            ->firstOrCreate(['name' => 'index tags'])
-            ->firstOrCreate(['name' => 'create tags'])
-            ->firstOrCreate(['name' => 'update tags'])
-            ->firstOrCreate(['name' => 'delete tags']);
+        $this->createPermissionsForAdmin();
+    }
+
+    private function createPermissionsForAdmin(): void
+    {
+        $this->createTagPermissions();
+        $this->createCategoryPermissions();
+        $this->createProductPermissions();
+        $this->createUserPermissions();
 
         $allPermissions = Permission::query()->get();
 
@@ -49,5 +45,50 @@ class InstallPermissionsCommand extends Command
             }
         }
 
+    }
+
+    private function createCategoryPermissions(): void
+    {
+        // categories
+        Permission::query()
+            ->firstOrCreate(['name' => 'index categories'])
+            ->firstOrCreate(['name' => 'store categories'])
+            ->firstOrCreate(['name' => 'update categories'])
+            ->firstOrCreate(['name' => 'delete categories'])
+            ->firstOrCreate(['name' => 'show categories']);
+    }
+
+    private function createUserPermissions(): void
+    {
+        // users
+        Permission::query()
+            ->firstOrCreate(['name' => 'index users'])
+            ->firstOrCreate(['name' => 'show users']);
+    }
+
+    private function createTagPermissions(): void
+    {
+        // tags
+        Permission::query()
+            ->firstOrCreate(['name' => 'index tags'])
+            ->firstOrCreate(['name' => 'store tags'])
+            ->firstOrCreate(['name' => 'show tags'])
+            ->firstOrCreate(['name' => 'update tags'])
+            ->firstOrCreate(['name' => 'delete tags']);
+    }
+
+    private function createProductPermissions(): void
+    {
+        Permission::query()
+            ->firstOrCreate(['name' => 'index products'])
+            ->firstOrCreate(['name' => 'create products'])
+            ->firstOrCreate(['name' => 'show products'])
+            ->firstOrCreate(['name' => 'update products'])
+            ->firstOrCreate(['name' => 'delete products'])
+            ->firstOrCreate(['name' => 'store products'])
+            ->firstOrCreate(['name' => 'detachTag products'])
+            ->firstOrCreate(['name' => 'delete deleteProductImage products'])
+            ->firstOrCreate(['name' => 'deleteProductPreviewImage products'])
+            ->firstOrCreate(['name' => 'changeProductPreviewImage products']);
     }
 }
