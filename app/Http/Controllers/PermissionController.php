@@ -11,7 +11,9 @@ class PermissionController extends Controller
     public function getPermissions(): JsonResponse
     {
         $authUserPermissions = auth()->user()->getAllPermissions();
-        
+
         return response()->json(['permissions' => $authUserPermissions]);
     }
+
+
 }

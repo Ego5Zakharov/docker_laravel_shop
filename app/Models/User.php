@@ -15,6 +15,7 @@ use Tymon\JWTAuth\Contracts\JWTSubject;
  * @property string $email
  * @property string $password
  * @property string $remember_token
+ * @property Permission $permissions
  * @property Role $roles;
  */
 class User extends Authenticatable implements JWTSubject
@@ -36,7 +37,7 @@ class User extends Authenticatable implements JWTSubject
         'email_verified_at' => 'datetime',
     ];
 
-    protected static function boot()
+    protected static function boot(): void
     {
         parent::boot();
 
@@ -55,7 +56,17 @@ class User extends Authenticatable implements JWTSubject
             Role::class,
             'user_roles',
             'user_id',
-            'role_id');
+            'role_id'
+        );
     }
 
+    public function permissions(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            Permission::class,
+            'user_permissions',
+            'user_id',
+            'permission_id'
+        );
+    }
 }

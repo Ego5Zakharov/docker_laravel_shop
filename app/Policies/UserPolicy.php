@@ -18,4 +18,10 @@ class UserPolicy
     {
         return $user->hasPermissionTo('show users');
     }
+
+    public function create(User $user): bool
+    {
+        return $user->hasPermissionTo('create users');
+    }
+
 }

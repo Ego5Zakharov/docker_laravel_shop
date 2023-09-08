@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
  * @property int $id
  * @property string $name
  * @property string $description
+ * @property User $users
  */
 class Permission extends Model
 {
@@ -25,6 +26,17 @@ class Permission extends Model
             Role::class,
             'role_permissions',
             'permission_id',
-            'role_id');
+            'role_id'
+        );
+    }
+
+    public function users(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            Role::class,
+            'user_permissions',
+            'permission_id',
+            'user_id'
+        );
     }
 }
