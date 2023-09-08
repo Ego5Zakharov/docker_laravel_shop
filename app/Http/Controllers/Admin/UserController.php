@@ -40,4 +40,12 @@ class UserController extends Controller
 
         return UserResource::make($user);
     }
+
+    /**
+     * @throws AuthorizationException
+     */
+    public function create()
+    {
+        $this->authorize('create', User::class);
+    }
 }

@@ -2,15 +2,15 @@
 
 namespace App\Console\Commands;
 
+use App\Console\Commands\Helpers\InstallPermissionsHelper;
 use App\Enums\RoleEnum;
 use App\Models\Permission;
 use App\Models\Role;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\Auth;
-use SebastianBergmann\CodeCoverage\Report\PHP;
 
 class InstallPermissionsCommand extends Command
 {
+    use InstallPermissionsHelper;
 
     protected $signature = 'permissions:install';
 
@@ -34,6 +34,8 @@ class InstallPermissionsCommand extends Command
         $this->createCategoryPermissions();
         $this->createProductPermissions();
         $this->createUserPermissions();
+        $this->createRolePermissions();
+        $this->createPermissionPermissions();
 
         $allPermissions = Permission::query()->get();
 
@@ -47,48 +49,5 @@ class InstallPermissionsCommand extends Command
 
     }
 
-    private function createCategoryPermissions(): void
-    {
-        // categories
-        Permission::query()
-            ->firstOrCreate(['name' => 'index categories'])
-            ->firstOrCreate(['name' => 'store categories'])
-            ->firstOrCreate(['name' => 'update categories'])
-            ->firstOrCreate(['name' => 'delete categories'])
-            ->firstOrCreate(['name' => 'show categories']);
-    }
 
-    private function createUserPermissions(): void
-    {
-        // users
-        Permission::query()
-            ->firstOrCreate(['name' => 'index users'])
-            ->firstOrCreate(['name' => 'show users']);
-    }
-
-    private function createTagPermissions(): void
-    {
-        // tags
-        Permission::query()
-            ->firstOrCreate(['name' => 'index tags'])
-            ->firstOrCreate(['name' => 'store tags'])
-            ->firstOrCreate(['name' => 'show tags'])
-            ->firstOrCreate(['name' => 'update tags'])
-            ->firstOrCreate(['name' => 'delete tags']);
-    }
-
-    private function createProductPermissions(): void
-    {
-        Permission::query()
-            ->firstOrCreate(['name' => 'index products'])
-            ->firstOrCreate(['name' => 'create products'])
-            ->firstOrCreate(['name' => 'show products'])
-            ->firstOrCreate(['name' => 'update products'])
-            ->firstOrCreate(['name' => 'delete products'])
-            ->firstOrCreate(['name' => 'store products'])
-            ->firstOrCreate(['name' => 'detachTag products'])
-            ->firstOrCreate(['name' => 'delete deleteProductImage products'])
-            ->firstOrCreate(['name' => 'deleteProductPreviewImage products'])
-            ->firstOrCreate(['name' => 'changeProductPreviewImage products']);
-    }
 }

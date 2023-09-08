@@ -9,6 +9,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\TagController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\Product\ProductController;
+use App\Http\Controllers\Admin\RoleController as AdminRoleController;
+use App\Http\Controllers\Admin\PermissionController as AdminPermissionController;
 
 Route::group(['middleware' => 'api', 'prefix' => 'auth'], function ($router) {
     Route::post('/register', [RegisterController::class, 'register']);
@@ -48,12 +50,16 @@ Route::group(['middleware' => 'api', 'prefix' => 'auth'], function ($router) {
         function () {
             Route::post('/index', [CategoryController::class, 'index'])
                 ->middleware('checkApiPermission:index categories');
+
             Route::post('/', [CategoryController::class, 'store'])
                 ->middleware('checkApiPermission:store categories');
+
             Route::get('/{category}', [CategoryController::class, 'show'])
                 ->middleware('checkApiPermission:show categories');
+
             Route::patch('/{category}', [CategoryController::class, 'update'])
                 ->middleware('checkApiPermission:update categories');
+
             Route::delete('/{category}', [CategoryController::class, 'delete'])
                 ->middleware('checkApiPermission:delete categories');
         });
@@ -100,7 +106,57 @@ Route::group(['middleware' => 'api', 'prefix' => 'auth'], function ($router) {
         'middleware' => 'jwt.auth',
         'prefix' => 'users'
     ], function () {
-        Route::post('/index', [UserController::class, 'index'])->middleware('checkApiPermission:index users');
-        Route::get('/{user}/show/', [UserController::class, 'show'])->middleware('checkApiPermission:show users');
+        Route::post('/index', [UserController::class, 'index'])
+            ->middleware('checkApiPermission:index users');
+
+        Route::get('/{user}/show/', [UserController::class, 'show'])
+            ->middleware('checkApiPermission:show users');
+
+//        Route::get('/{user}/show/', [UserController::class, 'create'])
+//            ->middleware('checkApiPermission:create users');
+    });
+
+    Route::group([
+        'namespaced' => 'Role',
+        'middleware' => 'jwt.auth',
+        'prefix' => 'roles'
+    ], function () {
+        Route::post('/index', [AdminRoleController::class, 'index'])
+            ->middleware('checkApiPermission:index roles');
+
+        Route::get('/{role}/show', [AdminRoleController::class, 'show'])
+            ->middleware('checkApiPermission:show roles');
+
+        Route::post('/store', [AdminRoleController::class, 'store'])
+            ->middleware('checkApiPermission:store roles');
+
+        Route::post('/{role}/delete', [AdminRoleController::class, 'delete'])
+            ->middleware('checkApiPermission:delete roles');
+    });
+
+
+    Route::group([
+        'namespaced' => 'Permission',
+        'middleware' => 'jwt.auth',
+        'prefix' => 'permissions'
+    ], function () {
+        Route::post('/index', [AdminPermissionController::class, 'index'])
+            ->middleware('checkApiPermission:index permissions');
+
+        Route::get('/{permission}/show', [AdminPermissionController::class, 'show'])
+            ->middleware('checkApiPermission:show permissions');
+
+        Route::get('/getAllPermissionsWithId', [AdminPermissionController::class, 'getAllPermissionsWithId'])
+            ->middleware('checkApiPermission:getAllPermissionsWithId permissions');
+
+        Route::post('/store', [AdminPermissionController::class, 'store'])
+            ->middleware('checkApiPermission:store permissions');
+
+        Route::patch('/{permission}/update', [AdminPermissionController::class, 'update'])
+            ->middleware('checkApiPermission:update permissions');
+
+        Route::delete('/{permission}/delete', [AdminPermissionController::class, 'delete'])
+            ->middleware('checkApiPermission:delete permissions');
+
     });
 });
