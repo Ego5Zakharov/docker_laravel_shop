@@ -6,7 +6,7 @@ class RoleData
 {
     public function __construct(
         public ?string $name,
-        public ?string $description
+        public ?array  $permissions
     )
     {
 

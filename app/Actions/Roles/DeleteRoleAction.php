@@ -3,13 +3,14 @@
 namespace App\Actions\Roles;
 
 use App\Models\Permission;
+use App\Models\Role;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
-class CreatePermissionAction
+class DeleteRoleAction
 {
-    public function run(RoleData $data): Model|Builder
+    public function run(Role $role): bool
     {
-
+        return $role->delete();
     }
 }
