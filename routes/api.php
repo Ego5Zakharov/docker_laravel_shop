@@ -112,8 +112,11 @@ Route::group(['middleware' => 'api', 'prefix' => 'auth'], function ($router) {
         Route::get('/{user}/show/', [UserController::class, 'show'])
             ->middleware('checkApiPermission:show users');
 
-//        Route::get('/{user}/show/', [UserController::class, 'create'])
-//            ->middleware('checkApiPermission:create users');
+        Route::get('/{user}/attachRolesToUser/', [UserController::class, 'attachRolesToUser'])
+            ->middleware('checkApiPermission:attachRolesToUser users');
+
+//        Route::get('/{user}/attachPermissionToUser/', [UserController::class, 'attachPermissionToUser'])
+//            ->middleware('checkApiPermission:attachPermissionsToUser users');
     });
 
     Route::group([
@@ -130,8 +133,14 @@ Route::group(['middleware' => 'api', 'prefix' => 'auth'], function ($router) {
         Route::post('/store', [AdminRoleController::class, 'store'])
             ->middleware('checkApiPermission:store roles');
 
+        Route::patch('/{role}/update', [AdminRoleController::class, 'update'])
+            ->middleware('checkApiPermission:update roles');
+
         Route::post('/{role}/delete', [AdminRoleController::class, 'delete'])
             ->middleware('checkApiPermission:delete roles');
+
+        Route::delete('/{role}/{permission}/detachPermissionFromRole', [AdminRoleController::class, 'detachPermissionFromRole'])
+            ->middleware('checkApiPermission:detachPermissionFromRole roles');
     });
 
 

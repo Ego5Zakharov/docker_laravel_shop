@@ -23,7 +23,9 @@ trait InstallPermissionsHelper
         Permission::query()
             ->firstOrCreate(['name' => 'index users'])
             ->firstOrCreate(['name' => 'show users'])
-            ->firstOrCreate(['name' => 'create users']);
+            ->firstOrCreate(['name' => 'create users'])
+            ->firstOrCreate(['name' => 'attachPermissionsToUser users'])
+            ->firstOrCreate(['name' => 'attachRolesToUser users']);
     }
 
     private function createRolePermissions(): void
@@ -34,7 +36,8 @@ trait InstallPermissionsHelper
             ->firstOrCreate(['name' => 'show roles'])
             ->firstOrCreate(['name' => 'store roles'])
             ->firstOrCreate(['name' => 'create roles'])
-            ->firstOrCreate(['name' => 'delete roles']);
+            ->firstOrCreate(['name' => 'update roles'])
+            ->firstOrCreate(['name' => 'detachPermissionFromRole roles']);
     }
 
     private function createPermissionPermissions(): void

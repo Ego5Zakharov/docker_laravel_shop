@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Actions\Permissions\CreatePermissionAction;
+use App\Actions\Permissions\DeletePermissionAction;
 use App\Actions\Permissions\PermissionData;
 use App\Actions\Permissions\UpdatePermissionAction;
 use App\Http\Controllers\Controller;
@@ -88,11 +89,9 @@ class PermissionController extends Controller
     {
         $this->authorize('delete', Permission::class);
 
-        if ($permission->delete()) {
-            return response()->json(['message' => 'deleted'], 204);
-        }
-
-        return response()->json(['message' => 'Failed to delete product'], 500);
+        return (new DeletePermissionAction)->run($permission) ?
+            response()->json(['message' => 'deleted'], 204) :
+            response()->json(['message' => 'Failed to delete permission'], 500);
     }
 
     /**

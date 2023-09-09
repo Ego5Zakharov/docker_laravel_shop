@@ -24,4 +24,15 @@ class UserPolicy
         return $user->hasPermissionTo('create users');
     }
 
+
+    public function attachRolesToUser(User $user): bool
+    {
+        return $user->hasPermissionTo('attachRolesToUser users');
+    }
+
+    public function attachPermissionsToUser(User $user): bool
+    {
+        return $user->hasPermissionTo('attachPermissionToUser users');
+    }
+
 }

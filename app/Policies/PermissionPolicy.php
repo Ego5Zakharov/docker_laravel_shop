@@ -39,4 +39,6 @@ class PermissionPolicy
         return $user->hasPermissionTo('getAllPermissionsWithId permissions');
     }
 
+
 }
+

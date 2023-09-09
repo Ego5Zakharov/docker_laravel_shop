@@ -2,10 +2,17 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Actions\Roles\CreateRoleAction;
+use App\Actions\Roles\DeleteRoleAction;
+use App\Actions\Roles\DetachPermissionFromRoleAction;
+use App\Actions\Roles\RoleData;
+use App\Actions\Roles\UpdateRoleAction;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Role\CreateRoleRequest;
 use App\Http\Requests\Role\IndexRoleRequest;
+use App\Http\Requests\Role\UpdateRoleRequest;
 use App\Http\Resources\Role\RoleResource;
+use App\Models\Permission;
 use App\Models\Role;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Http\JsonResponse;
@@ -29,13 +36,6 @@ class RoleController extends Controller
         return RoleResource::collection($roles);
     }
 
-//    /**
-//     * @throws AuthorizationException
-//     */
-//    public function create()
-//    {
-//        $this->authorize('create', Role::class);
-//    }
 
     /**
      * @throws AuthorizationException
@@ -46,15 +46,33 @@ class RoleController extends Controller
 
         $validatedData = $request->validated();
 
-        $role = Role::query()->create([
-            'name' => $validatedData['name']
-        ]);
+        $roleData = new RoleData(
+            name: $validatedData['name'],
+            permissions: $validatedData['permissions'] ?? null
+        );
 
-        if (isset($validatedData['permissions'])) {
-            $role->permissions()->attach($validatedData['permissions']);
-        }
+        return RoleResource::make(
+            (new CreateRoleAction)->run($roleData)
+        );
+    }
 
-        return RoleResource::make($role->refresh());
+    /**
+     * @throws AuthorizationException
+     */
+    public function update(Role $role, UpdateRoleRequest $request): RoleResource
+    {
+        $this->authorize('update', Role::class);
+
+        $validatedData = $request->validated();
+
+        $roleData = new RoleData(
+            name: $validatedData['name'],
+            permissions: $validatedData['permissions'] ?? null,
+        );
+
+        return RoleResource::make(
+            (new UpdateRoleAction)->run(data: $roleData, role: $role)
+        );
     }
 
     /**
@@ -71,25 +89,24 @@ class RoleController extends Controller
     /**
      * @throws AuthorizationException
      */
-    public function update()
+    public function delete(Role $role): JsonResponse
     {
-        $this->authorize('update', Role::class);
+        $this->authorize('delete', Role::class);
 
+        return (new DeleteRoleAction())->run($role) ?
+            response()->json(['message' => 'deleted'], 204) :
+            response()->json(['message' => 'Failed to delete role'], 500);
     }
 
     /**
      * @throws AuthorizationException
      */
-    public function delete(Role $role): JsonResponse
+    public function detachPermissionFromRole(Role $role, Permission $permission): JsonResponse
     {
-        $this->authorize('delete', Role::class);
+        $this->authorize('detachPermissionFromRole', Role::class);
 
-        $role->permissions()->detach();
-
-        if ($role->delete()) {
-            return response()->json(['message' => 'deleted'], 204);
-        }
-
-        return response()->json(['message' => 'Failed to delete product'], 500);
+        return (new DetachPermissionFromRoleAction)->run($role, $permission)
+            ? response()->json(['message' => 'Permission detached'], 204)
+            : response()->json(['message' => 'Failed to detach permission'], 500);
     }
 }
