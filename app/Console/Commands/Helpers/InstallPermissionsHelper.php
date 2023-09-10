@@ -24,6 +24,8 @@ trait InstallPermissionsHelper
             ->firstOrCreate(['name' => 'index users'])
             ->firstOrCreate(['name' => 'show users'])
             ->firstOrCreate(['name' => 'create users'])
+            ->firstOrCreate(['name' => 'detachPermissionFromUser users'])
+            ->firstOrCreate(['name' => 'detachRoleFromUser users'])
             ->firstOrCreate(['name' => 'attachPermissionsToUser users'])
             ->firstOrCreate(['name' => 'attachRolesToUser users']);
     }
@@ -37,6 +39,7 @@ trait InstallPermissionsHelper
             ->firstOrCreate(['name' => 'store roles'])
             ->firstOrCreate(['name' => 'create roles'])
             ->firstOrCreate(['name' => 'update roles'])
+            ->firstOrCreate(['name' => 'getAllRolesWithId roles'])
             ->firstOrCreate(['name' => 'detachPermissionFromRole roles']);
     }
 

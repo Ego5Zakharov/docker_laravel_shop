@@ -32,7 +32,19 @@ class UserPolicy
 
     public function attachPermissionsToUser(User $user): bool
     {
-        return $user->hasPermissionTo('attachPermissionToUser users');
+        return $user->hasPermissionTo('attachPermissionsToUser users');
+    }
+
+    public function detachPermissionFromUser(User $user): bool
+    {
+        return $user->hasPermissionTo('detachPermissionFromUser users');
+
+    }
+
+    public function detachRoleFromUser(User $user): bool
+    {
+        return $user->hasPermissionTo('detachRoleFromUser users');
+
     }
 
 }

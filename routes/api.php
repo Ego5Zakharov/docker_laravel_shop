@@ -20,6 +20,7 @@ Route::group(['middleware' => 'api', 'prefix' => 'auth'], function ($router) {
     Route::post('me', [AuthController::class, 'me']);
 
     Route::get('/permissions/', [PermissionController::class, 'getPermissions']);
+
     Route::get('/roles/', [RoleController::class, 'getRoles']);
 
     Route::group([
@@ -112,11 +113,14 @@ Route::group(['middleware' => 'api', 'prefix' => 'auth'], function ($router) {
         Route::get('/{user}/show/', [UserController::class, 'show'])
             ->middleware('checkApiPermission:show users');
 
-        Route::get('/{user}/attachRolesToUser/', [UserController::class, 'attachRolesToUser'])
+        Route::post('/getAllPermissionsWithoutRoles', [UserController::class, 'getAllPermissionsWithoutRoles'])
+            ->middleware('getAllPermissionsWithoutRoles:getAllPermissionsWithoutRoles users');
+
+        Route::post('/{user}/attachRolesToUser/', [UserController::class, 'attachRolesToUser'])
             ->middleware('checkApiPermission:attachRolesToUser users');
 
-//        Route::get('/{user}/attachPermissionToUser/', [UserController::class, 'attachPermissionToUser'])
-//            ->middleware('checkApiPermission:attachPermissionsToUser users');
+        Route::post('/{user}/attachPermissionToUser/', [UserController::class, 'attachPermissionsToUser'])
+            ->middleware('checkApiPermission:attachPermissionsToUser users');
     });
 
     Route::group([
@@ -136,8 +140,11 @@ Route::group(['middleware' => 'api', 'prefix' => 'auth'], function ($router) {
         Route::patch('/{role}/update', [AdminRoleController::class, 'update'])
             ->middleware('checkApiPermission:update roles');
 
-        Route::post('/{role}/delete', [AdminRoleController::class, 'delete'])
+        Route::delete('/{role}/delete', [AdminRoleController::class, 'delete'])
             ->middleware('checkApiPermission:delete roles');
+
+        Route::get('/getAllRolesWithId', [AdminRoleController::class, 'getAllRolesWithId'])
+            ->middleware('checkApiPermission:getAllRolesWithId roles');
 
         Route::delete('/{role}/{permission}/detachPermissionFromRole', [AdminRoleController::class, 'detachPermissionFromRole'])
             ->middleware('checkApiPermission:detachPermissionFromRole roles');

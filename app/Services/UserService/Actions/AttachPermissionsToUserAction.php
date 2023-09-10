@@ -10,8 +10,8 @@ class AttachPermissionsToUserAction
 
     public function run(): bool
     {
-        if (!is_null($this->permissions)) {
-            return (bool)$this->user->permissions()->syncWithoutDetaching($this->permissions);
+        if (!is_null($this->permissionsIds)) {
+            return (bool)$this->user->permissions()->syncWithoutDetaching($this->permissionsIds);
         }
 
         return false;

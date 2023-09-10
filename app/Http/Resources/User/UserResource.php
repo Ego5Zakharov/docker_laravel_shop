@@ -2,7 +2,9 @@
 
 namespace App\Http\Resources\User;
 
+use App\Http\Resources\Permission\PermissionResource;
 use App\Http\Resources\Role\RoleResource;
+use App\Models\Permission;
 use App\Models\User;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -15,7 +17,8 @@ class UserResource extends JsonResource
             'id' => $this->resource->id,
             'email' => $this->resource->email,
             'name' => $this->resource->name,
-            'roles' => RoleResource::collection($this->resource->roles)
+            'roles' => RoleResource::collection($this->resource->roles),
+            'permissionsWithoutRolesRelation' => PermissionResource::collection($this->resource->permissions),
         ];
     }
 }

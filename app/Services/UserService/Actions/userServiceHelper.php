@@ -28,7 +28,7 @@ trait userServiceHelper
 
     public function permissionsIds(array $permissionsIds): self
     {
-        $this->$permissionsIds = $permissionsIds;
+        $this->permissionsIds = $permissionsIds;
 
         return $this;
     }
