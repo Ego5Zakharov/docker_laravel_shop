@@ -39,6 +39,14 @@ class RolePolicy
         return $user->hasPermissionTo('delete roles');
     }
 
+    public function getAllRolesWithId(User $user): bool
+    {
+        return $user->hasPermissionTo('getAllRolesWithId roles');
+    }
+
+
+
+
     public function detachPermissionFromRole(User $user): bool
     {
         return $user->hasPermissionTo('detachPermissionFromRole roles');

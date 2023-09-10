@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Admin;
 
 use App\Actions\Users\UserData;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\User\AttachPermissionsToUserRequest;
+use App\Http\Requests\User\AttachRolesToUserRequest;
 use App\Http\Requests\User\EditUserRequest;
 use App\Http\Requests\User\IndexUserRequest;
 use App\Http\Resources\User\UserResource;
@@ -12,6 +14,7 @@ use App\Models\Role;
 use App\Models\User;
 use App\Services\UserService\UserService;
 use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
@@ -21,7 +24,7 @@ class UserController extends Controller
 
     public function __construct(UserService $userService)
     {
-        $this->$userService = $userService;
+        $this->userService = $userService;
     }
 
     /**
@@ -52,10 +55,18 @@ class UserController extends Controller
         return UserResource::make($user);
     }
 
+    // отправляет все полномочия пользователя не связанные с ролями
+    public function getAllPermissionsWithoutRoles(User $user): JsonResponse
+    {
+        $authUserPermissionsWithoutRoles = $user->getAllPermissionsWithoutRoles();
+
+        return response()->json(['permissionsWithoutRoles' => $authUserPermissionsWithoutRoles]);
+    }
+
     /**
      * @throws AuthorizationException
      */
-    public function attachRolesToUser(User $user, EditUserRequest $request): UserResource
+    public function attachRolesToUser(User $user, AttachRolesToUserRequest $request): UserResource
     {
         $this->authorize('attachRolesToUser', User::class);
 
@@ -74,7 +85,7 @@ class UserController extends Controller
     /**
      * @throws AuthorizationException
      */
-    public function attachPermissionsToUser(User $user, EditUserRequest $request): UserResource
+    public function attachPermissionsToUser(User $user, AttachPermissionsToUserRequest $request): UserResource
     {
         $this->authorize('attachPermissionsToUser', User::class);
 
@@ -89,6 +100,9 @@ class UserController extends Controller
         return UserResource::make($user);
     }
 
+    /**
+     * @throws AuthorizationException
+     */
     public function detachPermissionFromUser(User $user, EditUserRequest $request): UserResource
     {
         $this->authorize('detachPermissionFromUser', User::class);
@@ -104,6 +118,9 @@ class UserController extends Controller
         return UserResource::make($user);
     }
 
+    /**
+     * @throws AuthorizationException
+     */
     public function detachRoleFromUser(User $user, EditUserRequest $request): UserResource
     {
         $this->authorize('detachRoleFromUser', User::class);

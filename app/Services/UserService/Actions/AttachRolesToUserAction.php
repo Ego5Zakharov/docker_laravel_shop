@@ -9,7 +9,7 @@ class AttachRolesToUserAction
     public function run(): void
     {
         if (!is_null($this->user) && !is_null($this->rolesIds)) {
-            $this->user->roles()->attachWithoutSync($this->rolesIds);
+            $this->user->roles()->syncWithoutDetaching($this->rolesIds);
         }
     }
 }

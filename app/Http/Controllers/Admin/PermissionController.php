@@ -34,6 +34,7 @@ class PermissionController extends Controller
         return PermissionResource::collection($permissions);
     }
 
+
     /**
      * @throws AuthorizationException
      */

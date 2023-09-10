@@ -85,6 +85,17 @@ class RoleController extends Controller
         return RoleResource::make($role);
     }
 
+    /**
+     * @throws AuthorizationException
+     */
+    public function getAllRolesWithId(): AnonymousResourceCollection
+    {
+        $this->authorize('getAllRolesWithId', Role::class);
+
+        return RoleResource::collection(
+            Role::query()->get()
+        );
+    }
 
     /**
      * @throws AuthorizationException
