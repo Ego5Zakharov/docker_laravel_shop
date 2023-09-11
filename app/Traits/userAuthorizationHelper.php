@@ -4,10 +4,7 @@
 namespace App\Traits;
 
 
-use App\Models\Permission;
-use App\Models\User;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 
 trait userAuthorizationHelper
