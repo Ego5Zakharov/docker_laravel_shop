@@ -6,6 +6,7 @@ use App\Actions\Users\UserData;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\User\AttachPermissionsToUserRequest;
 use App\Http\Requests\User\AttachRolesToUserRequest;
+use App\Http\Requests\User\DetachUserRoleRequest;
 use App\Http\Requests\User\EditUserRequest;
 use App\Http\Requests\User\IndexUserRequest;
 use App\Http\Resources\User\UserResource;
@@ -103,16 +104,14 @@ class UserController extends Controller
     /**
      * @throws AuthorizationException
      */
-    public function detachPermissionFromUser(User $user, EditUserRequest $request): UserResource
+    public function detachPermissionFromUser(User $user, Permission $permission): UserResource
     {
         $this->authorize('detachPermissionFromUser', User::class);
 
-        $validatedData = $request->validated();
-
-        $this->userService
+         $this->userService
             ->detachPermissionFromUser()
             ->user($user)
-            ->permissionsIds($validatedData['permissions'])
+            ->permissionId($permission->id)
             ->run();
 
         return UserResource::make($user);
@@ -121,27 +120,18 @@ class UserController extends Controller
     /**
      * @throws AuthorizationException
      */
-    public function detachRoleFromUser(User $user, EditUserRequest $request): UserResource
+    public function detachRoleFromUser(User $user, Role $role): UserResource
     {
         $this->authorize('detachRoleFromUser', User::class);
-
-        $validatedData = $request->validated();
 
         $this->userService
             ->detachRoleFromUser()
             ->user($user)
-            ->permissionsIds($validatedData['permissions'])
+            ->roleId($role->id)
             ->run();
 
         return UserResource::make($user);
     }
 
 
-    /**
-     * @throws AuthorizationException
-     */
-    public function create()
-    {
-        $this->authorize('update', User::class);
-    }
 }

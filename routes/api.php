@@ -119,8 +119,14 @@ Route::group(['middleware' => 'api', 'prefix' => 'auth'], function ($router) {
         Route::post('/{user}/attachRolesToUser/', [UserController::class, 'attachRolesToUser'])
             ->middleware('checkApiPermission:attachRolesToUser users');
 
-        Route::post('/{user}/attachPermissionToUser/', [UserController::class, 'attachPermissionsToUser'])
+        Route::post('/{user}/attachPermissionToUser', [UserController::class, 'attachPermissionsToUser'])
             ->middleware('checkApiPermission:attachPermissionsToUser users');
+
+        Route::delete('/{user}/{role}/detachRoleFromUser/', [UserController::class, 'detachRoleFromUser'])
+            ->middleware('checkApiPermission:detachRoleFromUser users');
+
+        Route::delete('/{user}/{permission}/detachPermissionFromUser', [UserController::class, 'detachPermissionFromUser'])
+            ->middleware('checkApiPermission:detachPermissionFromUser users');
     });
 
     Route::group([
