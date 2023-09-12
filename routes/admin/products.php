@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\Product\ProductController;
+use App\Http\Controllers\Admin\ProductController;
 use Illuminate\Support\Facades\Route;
 
 Route::group(['middleware' => 'api', 'prefix' => 'auth'], function () {
