@@ -13,11 +13,9 @@ class RouteServiceProvider extends ServiceProvider
 
     public const HOME = '/home';
 
-
     // protected $namespace = 'App\\Http\\Controllers';
 
-
-    public function boot()
+    public function boot(): void
     {
         $this->configureRateLimiting();
 

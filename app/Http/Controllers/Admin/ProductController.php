@@ -1,12 +1,11 @@
 <?php
 
-namespace App\Http\Controllers\Product;
+namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Product\CreateProductRequest;
 use App\Http\Requests\Product\IndexProductRequest;
 use App\Http\Requests\Product\UpdateProductRequest;
-use App\Http\Resources\Image\ImageResource;
 use App\Http\Resources\Product\ProductResource;
 use App\Http\Resources\Products\CreateProductDataResource;
 use App\Models\Image;
