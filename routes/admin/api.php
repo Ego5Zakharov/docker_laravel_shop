@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Route;
 
 
 Route::post('/searchProducts', [SearchController::class, 'search']);
+Route::get('/getAllProducts', [SearchController::class, 'getAllProducts']);
 
 Route::group(['middleware' => 'api', 'prefix' => 'auth'], function ($router) {
     Route::post('/register', [RegisterController::class, 'register']);
@@ -22,4 +23,5 @@ Route::group(['middleware' => 'api', 'prefix' => 'auth'], function ($router) {
 
     Route::get('/permissions/', [PermissionController::class, 'getPermissions']);
     Route::get('/roles/', [RoleController::class, 'getRoles']);
+
 });

@@ -7,10 +7,14 @@ use Illuminate\Pagination\LengthAwarePaginator;
 
 class SearchProductsAction
 {
-    private null|string $search_field;
+    private ?string $search_field = null;
 
     public function run(): LengthAwarePaginator
     {
+        if ($this->search_field === null) {
+            return Product::query()->paginate(12);
+        }
+
         return Product::query()
             ->where('title', 'like', '%' . $this->search_field . '%')
             ->orWhere('description', 'like', '%' . $this->search_field . '%')
@@ -19,10 +23,10 @@ class SearchProductsAction
                 $query->orWhere('title', 'like', '%' . $this->search_field . '%');
             })->orWhereHas('tags', function ($query) {
                 $query->orWhere('title', 'like', '%' . $this->search_field . '%');
-            })->paginate(6);
+            })->paginate(12);
     }
 
-    public function setSearchField(string $search_field): self
+    public function setSearchField(?string $search_field): self
     {
         $this->search_field = $search_field;
 
